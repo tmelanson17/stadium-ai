@@ -1,3 +1,6 @@
 [submodule "third-party/tesseract"]
 	path = third-party/tesseract
 	url = https://github.com/tesseract-ocr/tesseract.git
+[submodule "third-party/damage-calc"]
+	path = third-party/damage-calc
+	url = git@github.com:smogon/damage-calc.git

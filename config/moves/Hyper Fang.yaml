@@ -1,0 +1,52 @@
+exists: true
+name: Hyper Fang
+isNonstandard: null
+num: 158
+accuracy: 90
+basePower: 80
+category: Physical
+pp: 15
+priority: 0
+flags:
+  bite: 1
+  contact: 1
+  protect: 1
+  mirror: 1
+secondary: &ref_0
+  chance: 10
+  volatileStatus: flinch
+target: normal
+type: Normal
+contestType: Cool
+desc: Has a 10% chance to make the target flinch.
+shortDesc: 10% chance to make the target flinch.
+id: hyperfang
+fullname: 'move: Hyper Fang'
+effectType: Move
+gen: 1
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries:
+  - *ref_0
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 130
+zMove:
+  basePower: 160

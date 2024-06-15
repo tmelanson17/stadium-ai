@@ -1,0 +1,46 @@
+exists: true
+name: Acid Armor
+pp: 40
+num: 151
+accuracy: true
+basePower: 0
+category: Status
+priority: 0
+flags:
+  snatch: 1
+boosts:
+  def: 2
+secondary: null
+target: self
+type: Poison
+zMove:
+  effect: clearnegativeboost
+contestType: Tough
+desc: Raises the user's Defense by 2 stages.
+shortDesc: Raises the user's Defense by 2.
+id: acidarmor
+fullname: 'move: Acid Armor'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Poison
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false

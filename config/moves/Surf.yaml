@@ -1,0 +1,48 @@
+exists: true
+name: Surf
+target: allAdjacentFoes
+basePower: 95
+num: 57
+accuracy: 100
+category: Special
+pp: 15
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+  nonsky: 1
+secondary: null
+type: Water
+contestType: Beautiful
+desc: No additional effect.
+shortDesc: No additional effect.
+id: surf
+fullname: 'move: Surf'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Water
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 130
+zMove:
+  basePower: 175

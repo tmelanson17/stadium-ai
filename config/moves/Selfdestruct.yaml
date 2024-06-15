@@ -1,0 +1,52 @@
+exists: true
+name: Self-Destruct
+basePower: 130
+target: normal
+noSketch: true
+num: 120
+accuracy: 100
+category: Physical
+pp: 5
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+  noparentalbond: 1
+selfdestruct: always
+secondary: null
+type: Normal
+contestType: Beautiful
+desc: >-
+  The user faints after using this move, unless the target's substitute was
+  broken by the damage. The target's Defense is halved during damage
+  calculation.
+shortDesc: Target's Def halved during damage. User faints.
+id: selfdestruct
+fullname: 'move: Self-Destruct'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+maxMove:
+  basePower: 140
+zMove:
+  basePower: 195

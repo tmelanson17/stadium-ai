@@ -1,0 +1,48 @@
+exists: true
+name: Mirror Move
+flags:
+  failencore: 1
+noSketch: true
+target: self
+isNonstandard: null
+num: 119
+accuracy: true
+basePower: 0
+category: Status
+pp: 20
+priority: 0
+secondary: null
+type: Flying
+zMove:
+  boost:
+    atk: 2
+contestType: Clever
+desc: >-
+  The user uses the last move used by the target. Fails if the target has not
+  made a move since the user switched in, or if the last move used was Mirror
+  Move.
+shortDesc: User uses the target's last used move against it.
+id: mirrormove
+fullname: 'move: Mirror Move'
+effectType: Move
+gen: 1
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Flying
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false

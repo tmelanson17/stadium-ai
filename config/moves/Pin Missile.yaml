@@ -1,0 +1,54 @@
+exists: true
+name: Pin Missile
+accuracy: 85
+basePower: 14
+num: 42
+category: Physical
+pp: 20
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+multihit:
+  - 2
+  - 5
+secondary: null
+target: normal
+type: Bug
+zMove:
+  basePower: 140
+maxMove:
+  basePower: 130
+contestType: Cool
+desc: >-
+  Hits two to five times. Has a 3/8 chance to hit two or three times, and a 1/8
+  chance to hit four or five times. Damage is calculated once for the first hit
+  and used for every hit. If one of the hits breaks the target's substitute, the
+  move ends.
+shortDesc: Hits 2-5 times in one turn.
+id: pinmissile
+fullname: 'move: Pin Missile'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Bug
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false

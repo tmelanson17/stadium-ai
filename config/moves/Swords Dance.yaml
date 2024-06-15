@@ -1,0 +1,47 @@
+exists: true
+name: Swords Dance
+pp: 30
+num: 14
+accuracy: true
+basePower: 0
+category: Status
+priority: 0
+flags:
+  snatch: 1
+  dance: 1
+boosts:
+  atk: 2
+secondary: null
+target: self
+type: Normal
+zMove:
+  effect: clearnegativeboost
+contestType: Beautiful
+desc: Raises the user's Attack by 2 stages.
+shortDesc: Raises the user's Attack by 2.
+id: swordsdance
+fullname: 'move: Swords Dance'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false

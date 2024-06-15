@@ -1,0 +1,50 @@
+exists: true
+name: Thunderbolt
+basePower: 95
+num: 85
+accuracy: 100
+category: Special
+pp: 15
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+secondary: &ref_0
+  chance: 10
+  status: par
+target: normal
+type: Electric
+contestType: Cool
+desc: Has a 10% chance to paralyze the target.
+shortDesc: 10% chance to paralyze the target.
+id: thunderbolt
+fullname: 'move: Thunderbolt'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Electric
+secondaries:
+  - *ref_0
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 130
+zMove:
+  basePower: 175

@@ -1,0 +1,61 @@
+exists: true
+name: Bind
+ignoreImmunity: true
+volatileStatus: partiallytrapped
+self:
+  volatileStatus: partialtrappinglock
+accuracy: 75
+num: 20
+basePower: 15
+category: Physical
+pp: 20
+priority: 0
+flags:
+  contact: 1
+  protect: 1
+  mirror: 1
+secondary: null
+target: normal
+type: Normal
+contestType: Tough
+desc: >-
+  The user spends two to five turns using this move. Has a 3/8 chance to last
+  two or three turns, and a 1/8 chance to last four or five turns. The damage
+  calculated for the first turn is used for every other turn. The user cannot
+  select a move and the target cannot execute a move during the effect, but both
+  may switch out. If the user switches out, the target remains unable to execute
+  a move during that turn. If the target switches out, the user uses this move
+  again automatically, and if it had 0 PP at the time, it becomes 63. If the
+  user or the target switch out, or the user is prevented from moving, the
+  effect ends. This move can prevent the target from moving even if it has type
+  immunity, but will not deal damage.
+shortDesc: Prevents the target from moving for 2-5 turns.
+id: bind
+fullname: 'move: Bind'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 90
+zMove:
+  basePower: 100

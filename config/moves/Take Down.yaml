@@ -1,0 +1,54 @@
+exists: true
+name: Take Down
+num: 36
+accuracy: 85
+basePower: 90
+category: Physical
+pp: 20
+priority: 0
+flags:
+  contact: 1
+  protect: 1
+  mirror: 1
+recoil:
+  - 1
+  - 4
+secondary: null
+target: normal
+type: Normal
+contestType: Tough
+desc: >-
+  If the target lost HP, the user takes recoil damage equal to 1/4 the HP lost
+  by the target, rounded down, but not less than 1 HP. If this move breaks the
+  target's substitute, the user does not take any recoil damage.
+shortDesc: Has 1/4 recoil.
+id: takedown
+fullname: 'move: Take Down'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 130
+zMove:
+  basePower: 175

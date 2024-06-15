@@ -1,0 +1,57 @@
+exists: true
+name: Dig
+basePower: 100
+condition: {}
+flags:
+  contact: 1
+  charge: 1
+  protect: 1
+  mirror: 1
+  nonsky: 1
+  nosleeptalk: 1
+num: 91
+accuracy: 100
+category: Physical
+pp: 10
+priority: 0
+secondary: null
+target: normal
+type: Ground
+contestType: Tough
+desc: >-
+  This attack charges on the first turn and executes on the second. On the first
+  turn, the user avoids all attacks other than Bide, Swift, and Transform. If
+  the user is fully paralyzed on the second turn, it continues avoiding attacks
+  until it switches out or successfully executes the second turn of this move or
+  Fly.
+shortDesc: Digs underground turn 1, strikes turn 2.
+id: dig
+fullname: 'move: Dig'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Ground
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 130
+zMove:
+  basePower: 180

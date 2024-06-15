@@ -1,0 +1,51 @@
+# TODO: Update page with accurate info
+# List order: hp, atk, def, spc, spe
+Electrode:
+  type: Electric
+  level: 61
+  stats: [140, 100, 100, 100, 100]
+  moves: ["Thunder", "Thunderbolt", "Selfdestruct", "Thunder Wave"]
+Jynx:
+  type: Ice, Psychic
+  level: 50
+  moves: ["Psychic", "Ice Punch"]
+  stats: [140, 100, 100, 100, 100]
+Vulpix:
+  type: Fire
+  level: 50
+  moves: ["Flamethrower"]
+  stats: [140, 100, 100, 100, 100]
+Wigglytuff:
+  type: Normal
+  level: 50
+  moves: ["Double-Edge"]
+  stats: [140, 100, 100, 100, 100]
+Poliwrath:
+  type: Water, Fighting
+  level: 50
+  moves: ["Hydro Pump"]
+Rhydon:
+  type: Ground, Rock
+  level: 50
+  moves: ["Strength", "Dig"]
+  stats: [140, 100, 100, 100, 100]
+Aerodactyl:
+  type: Rock, Flying
+  level: 50
+  moves: ["Fly", "Supersonic", "Dragon Rage"]
+  stats: [140, 100, 100, 100, 100]
+Magikarp:
+  type: Water
+  level: 50
+  moves: ["Splash"]
+  stats: [140, 100, 100, 100, 100]
+Weedle:
+  type: Bug, Poison
+  level: 50
+  moves: ["Poison Sting"]
+  stats: [140, 100, 100, 100, 100]
+Nidorina:
+  type: Poison
+  level: 50
+  moves: ["Thunder"]
+  stats: [140, 100, 100, 100, 100]

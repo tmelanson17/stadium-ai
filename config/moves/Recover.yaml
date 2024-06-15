@@ -1,0 +1,48 @@
+exists: true
+name: Recover
+heal: null
+pp: 20
+num: 105
+accuracy: true
+basePower: 0
+category: Status
+priority: 0
+flags:
+  snatch: 1
+  heal: 1
+secondary: null
+target: self
+type: Normal
+zMove:
+  effect: clearnegativeboost
+contestType: Clever
+desc: >-
+  The user restores 1/2 of its maximum HP, rounded down. Fails if (user's
+  maximum HP - user's current HP + 1) is divisible by 256.
+shortDesc: Heals the user by 50% of its max HP.
+id: recover
+fullname: 'move: Recover'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false

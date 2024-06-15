@@ -1,0 +1,50 @@
+exists: true
+name: Night Shade
+ignoreImmunity: true
+basePower: 1
+num: 101
+accuracy: 100
+damage: level
+category: Physical
+pp: 15
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+secondary: null
+target: normal
+type: Ghost
+contestType: Clever
+desc: >-
+  Deals damage to the target equal to the user's level. This move ignores type
+  immunity.
+shortDesc: Damage = user's level. Can hit Normal types.
+id: nightshade
+fullname: 'move: Night Shade'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Ghost
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 90
+zMove:
+  basePower: 100

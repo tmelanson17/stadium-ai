@@ -1,0 +1,51 @@
+exists: true
+name: Double Kick
+num: 24
+accuracy: 100
+basePower: 30
+category: Physical
+pp: 30
+priority: 0
+flags:
+  contact: 1
+  protect: 1
+  mirror: 1
+multihit: 2
+secondary: null
+target: normal
+type: Fighting
+maxMove:
+  basePower: 80
+contestType: Cool
+desc: >-
+  Hits twice. Damage is calculated once for the first hit and used for both
+  hits. If the first hit breaks the target's substitute, the move ends.
+shortDesc: Hits 2 times in one turn.
+id: doublekick
+fullname: 'move: Double Kick'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Fighting
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+zMove:
+  basePower: 100

@@ -1,0 +1,51 @@
+exists: true
+name: Low Kick
+accuracy: 90
+basePower: 50
+secondary: &ref_0
+  chance: 30
+  volatileStatus: flinch
+num: 67
+category: Physical
+pp: 20
+priority: 0
+flags:
+  contact: 1
+  protect: 1
+  mirror: 1
+target: normal
+type: Fighting
+zMove:
+  basePower: 160
+contestType: Tough
+desc: Has a 30% chance to make the target flinch.
+shortDesc: 30% chance to make the target flinch.
+id: lowkick
+fullname: 'move: Low Kick'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Fighting
+secondaries:
+  - *ref_0
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 75

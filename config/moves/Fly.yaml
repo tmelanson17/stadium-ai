@@ -1,0 +1,57 @@
+exists: true
+name: Fly
+condition: {}
+basePower: 70
+flags:
+  contact: 1
+  charge: 1
+  protect: 1
+  mirror: 1
+  gravity: 1
+  distance: 1
+num: 19
+accuracy: 95
+category: Physical
+pp: 15
+priority: 0
+secondary: null
+target: any
+type: Flying
+contestType: Clever
+desc: >-
+  This attack charges on the first turn and executes on the second. On the first
+  turn, the user avoids all attacks other than Bide, Swift, and Transform. If
+  the user is fully paralyzed on the second turn, it continues avoiding attacks
+  until it switches out or successfully executes the second turn of this move or
+  Dig.
+shortDesc: Flies up on first turn, then strikes the next turn.
+id: fly
+fullname: 'move: Fly'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Flying
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 120
+zMove:
+  basePower: 140

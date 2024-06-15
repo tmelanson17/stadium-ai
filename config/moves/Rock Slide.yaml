@@ -1,0 +1,47 @@
+exists: true
+name: Rock Slide
+secondary: null
+target: normal
+num: 157
+accuracy: 90
+basePower: 75
+category: Physical
+pp: 10
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+type: Rock
+contestType: Tough
+desc: No additional effect.
+shortDesc: No additional effect.
+id: rockslide
+fullname: 'move: Rock Slide'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Rock
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 130
+zMove:
+  basePower: 140

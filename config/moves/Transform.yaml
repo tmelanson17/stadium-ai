@@ -1,0 +1,49 @@
+exists: true
+name: Transform
+noSketch: true
+flags:
+  bypasssub: 1
+  failencore: 1
+num: 144
+accuracy: true
+basePower: 0
+category: Status
+pp: 10
+priority: 0
+secondary: null
+target: normal
+type: Normal
+zMove:
+  effect: heal
+contestType: Clever
+desc: >-
+  The user transforms into the target. The target's current stats, stat stages,
+  types, moves, DVs, species, and sprite are copied. The user's level and HP
+  remain the same and each copied move receives only 5 PP. This move can hit a
+  target using Dig or Fly.
+shortDesc: Copies target's stats, moves, types, and species.
+id: transform
+fullname: 'move: Transform'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false

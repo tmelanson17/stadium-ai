@@ -1,0 +1,49 @@
+exists: true
+name: Flash
+accuracy: 70
+isNonstandard: null
+num: 148
+basePower: 0
+category: Status
+pp: 20
+priority: 0
+flags:
+  protect: 1
+  reflectable: 1
+  mirror: 1
+boosts:
+  accuracy: -1
+secondary: null
+target: normal
+type: Normal
+zMove:
+  boost:
+    evasion: 1
+contestType: Beautiful
+desc: Lowers the target's accuracy by 1 stage.
+shortDesc: Lowers the target's accuracy by 1.
+id: flash
+fullname: 'move: Flash'
+effectType: Move
+gen: 1
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false

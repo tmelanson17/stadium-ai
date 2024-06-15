@@ -1,0 +1,60 @@
+exists: true
+name: Counter
+ignoreImmunity: true
+willCrit: false
+basePower: 1
+condition: {}
+priority: -1
+num: 68
+accuracy: 100
+category: Physical
+pp: 20
+flags:
+  contact: 1
+  protect: 1
+  failmefirst: 1
+  noassist: 1
+  failcopycat: 1
+secondary: null
+target: scripted
+type: Fighting
+maxMove:
+  basePower: 75
+contestType: Tough
+desc: >-
+  Deals damage to the opposing Pokemon equal to twice the damage dealt by the
+  last move used in the battle. This move ignores type immunity. Fails if the
+  user moves first, or if the opposing side's last move was Counter, had 0
+  power, or was not Normal or Fighting type. Fails if the last move used by
+  either side did 0 damage and was not Confuse Ray, Conversion, Focus Energy,
+  Glare, Haze, Leech Seed, Light Screen, Mimic, Mist, Poison Gas, Poison Powder,
+  Recover, Reflect, Rest, Soft-Boiled, Splash, Stun Spore, Substitute,
+  Supersonic, Teleport, Thunder Wave, Toxic, or Transform.
+shortDesc: If hit by Normal/Fighting move, deals 2x damage.
+id: counter
+fullname: 'move: Counter'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Fighting
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+zMove:
+  basePower: 100

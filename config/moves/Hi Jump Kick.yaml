@@ -1,0 +1,53 @@
+exists: true
+name: High Jump Kick
+basePower: 85
+pp: 20
+num: 136
+accuracy: 90
+category: Physical
+priority: 0
+flags:
+  contact: 1
+  protect: 1
+  mirror: 1
+  gravity: 1
+hasCrashDamage: true
+secondary: null
+target: normal
+type: Fighting
+contestType: Cool
+desc: >-
+  If this attack misses the target, the user takes 1 HP of crash damage. If the
+  user has a substitute, the crash damage is dealt to the target's substitute if
+  it has one, otherwise no crash damage is dealt.
+shortDesc: User takes 1 HP of damage if it misses.
+id: highjumpkick
+fullname: 'move: High Jump Kick'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Fighting
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 90
+zMove:
+  basePower: 160

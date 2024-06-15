@@ -1,0 +1,49 @@
+exists: true
+name: Stun Spore
+num: 78
+accuracy: 75
+basePower: 0
+category: Status
+pp: 30
+priority: 0
+flags:
+  powder: 1
+  protect: 1
+  reflectable: 1
+  mirror: 1
+status: par
+secondary: null
+target: normal
+type: Grass
+zMove:
+  boost:
+    spd: 1
+contestType: Clever
+desc: Paralyzes the target.
+shortDesc: Paralyzes the target.
+id: stunspore
+fullname: 'move: Stun Spore'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Grass
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false

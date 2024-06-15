@@ -1,0 +1,48 @@
+exists: true
+name: Razor Leaf
+critRatio: 2
+target: normal
+num: 75
+accuracy: 95
+basePower: 55
+category: Special
+pp: 25
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+  slicing: 1
+secondary: null
+type: Grass
+contestType: Cool
+desc: Has a higher chance for a critical hit.
+shortDesc: High critical hit ratio.
+id: razorleaf
+fullname: 'move: Razor Leaf'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+baseMoveType: Grass
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 110
+zMove:
+  basePower: 100

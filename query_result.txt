@@ -1,0 +1,220 @@
+gen: &ref_0
+  num: 1
+  abilities:
+    gen: 1
+  items:
+    gen: 1
+  moves:
+    gen: 1
+  species:
+    gen: 1
+  types:
+    gen: 1
+  natures: {}
+attacker:
+  species:
+    kind: Species
+    id: gengar
+    name: Gengar
+    baseStats:
+      hp: 60
+      atk: 65
+      def: 60
+      spa: 130
+      spd: 130
+      spe: 110
+    types: &ref_1
+      - Ghost
+      - Poison
+    weightkg: 40.5
+  gen: *ref_0
+  name: Gengar
+  types: *ref_1
+  weightkg: 40.5
+  level: 50
+  gender: M
+  abilityOn: false
+  isDynamaxed: false
+  isSaltCure: false
+  nature: Serious
+  ivs:
+    hp: 30
+    atk: 31
+    def: 31
+    spa: 31
+    spd: 31
+    spe: 31
+  evs:
+    hp: 252
+    atk: 252
+    def: 252
+    spa: 252
+    spd: 252
+    spe: 252
+  boosts:
+    hp: 0
+    atk: 0
+    def: 0
+    spa: 0
+    spd: 0
+    spe: 0
+  rawStats:
+    hp: 166
+    atk: 116
+    def: 111
+    spa: 181
+    spd: 181
+    spe: 161
+  stats:
+    hp: 166
+    atk: 116
+    def: 111
+    spa: 181
+    spd: 181
+    spe: 161
+  originalCurHP: 166
+  status: ''
+  toxicCounter: 0
+  moves: []
+defender:
+  species:
+    kind: Species
+    id: chansey
+    name: Chansey
+    baseStats:
+      hp: 250
+      atk: 5
+      def: 5
+      spa: 105
+      spd: 105
+      spe: 50
+    types: &ref_2
+      - Normal
+    weightkg: 34.6
+  gen: *ref_0
+  name: Chansey
+  types: *ref_2
+  weightkg: 34.6
+  level: 50
+  gender: M
+  abilityOn: false
+  isDynamaxed: false
+  isSaltCure: false
+  nature: Serious
+  ivs:
+    hp: 30
+    atk: 31
+    def: 31
+    spa: 31
+    spd: 31
+    spe: 31
+  evs:
+    hp: 252
+    atk: 252
+    def: 252
+    spa: 252
+    spd: 252
+    spe: 252
+  boosts:
+    hp: 0
+    atk: 0
+    def: 0
+    spa: 0
+    spd: 0
+    spe: 0
+  rawStats:
+    hp: 356
+    atk: 56
+    def: 56
+    spa: 156
+    spd: 156
+    spe: 101
+  stats:
+    hp: 356
+    atk: 56
+    def: 56
+    spa: 156
+    spd: 156
+    spe: 101
+  originalCurHP: 356
+  status: ''
+  toxicCounter: 0
+  moves: []
+move:
+  originalName: Recover
+  hits: 1
+  gen: *ref_0
+  name: Recover
+  bp: 0
+  type: Normal
+  category: Status
+  timesUsed: 1
+  target: any
+  hasCrashDamage: false
+  mindBlownRecoil: false
+  struggleRecoil: false
+  isCrit: false
+  isStellarFirstUse: false
+  flags: {}
+  priority: 0
+  ignoreDefensive: false
+  breaksProtect: false
+  isZ: false
+  isMax: false
+field:
+  gameType: Singles
+  isMagicRoom: false
+  isWonderRoom: false
+  isGravity: false
+  isAuraBreak: false
+  isFairyAura: false
+  isDarkAura: false
+  isBeadsOfRuin: false
+  isSwordOfRuin: false
+  isTabletsOfRuin: false
+  isVesselOfRuin: false
+  attackerSide:
+    spikes: 0
+    steelsurge: false
+    vinelash: false
+    wildfire: false
+    cannonade: false
+    volcalith: false
+    isSR: false
+    isReflect: false
+    isLightScreen: false
+    isProtected: false
+    isSeeded: false
+    isForesight: false
+    isTailwind: false
+    isHelpingHand: false
+    isFlowerGift: false
+    isFriendGuard: false
+    isAuroraVeil: false
+    isBattery: false
+    isPowerSpot: false
+  defenderSide:
+    spikes: 0
+    steelsurge: false
+    vinelash: false
+    wildfire: false
+    cannonade: false
+    volcalith: false
+    isSR: false
+    isReflect: false
+    isLightScreen: false
+    isProtected: false
+    isSeeded: false
+    isForesight: false
+    isTailwind: false
+    isHelpingHand: false
+    isFlowerGift: false
+    isFriendGuard: false
+    isAuroraVeil: false
+    isBattery: false
+    isPowerSpot: false
+damage: 0
+rawDesc:
+  attackerName: Gengar
+  moveName: Recover
+  defenderName: Chansey

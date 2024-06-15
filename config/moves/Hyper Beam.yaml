@@ -1,0 +1,53 @@
+exists: true
+name: Hyper Beam
+num: 63
+accuracy: 90
+basePower: 150
+category: Physical
+pp: 5
+priority: 0
+flags:
+  recharge: 1
+  protect: 1
+  mirror: 1
+self:
+  volatileStatus: mustrecharge
+secondary: null
+target: normal
+type: Normal
+contestType: Cool
+desc: >-
+  If this move is successful, the user must recharge on the following turn and
+  cannot select a move, unless the target or its substitute was knocked out by
+  this move.
+shortDesc: Can't move next turn if target or sub is not KOed.
+id: hyperbeam
+fullname: 'move: Hyper Beam'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 150
+zMove:
+  basePower: 200

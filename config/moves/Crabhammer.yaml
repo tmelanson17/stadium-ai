@@ -1,0 +1,48 @@
+exists: true
+name: Crabhammer
+critRatio: 2
+accuracy: 85
+basePower: 90
+num: 152
+category: Special
+pp: 10
+priority: 0
+flags:
+  contact: 1
+  protect: 1
+  mirror: 1
+secondary: null
+target: normal
+type: Water
+contestType: Tough
+desc: Has a higher chance for a critical hit.
+shortDesc: High critical hit ratio.
+id: crabhammer
+fullname: 'move: Crabhammer'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+baseMoveType: Water
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 130
+zMove:
+  basePower: 175

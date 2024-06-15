@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "@smogon/calc": "^0.9.0",
+    "commander": "^7.2.0",
+    "js-yaml": "^4.1.0",
+    "pokemon-showdown": "^0.11.9"
+  },
+  "name": "stadium-ai",
+  "version": "1.0.0",
+  "description": "Calculates the damage of a move between two pokemon",
+  "main": "query_calc.js",
+  "scripts": {
+    "test": "node query_calc.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmelanson17/stadium-ai.git"
+  },
+  "keywords": [
+    "pokemon",
+    "calculator",
+    "damage"
+  ],
+  "author": "TJ",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tmelanson17/stadium-ai/issues"
+  },
+  "homepage": "https://github.com/tmelanson17/stadium-ai#readme"
+}

@@ -1,0 +1,44 @@
+exists: true
+name: Reflect
+num: 115
+accuracy: true
+basePower: 0
+category: Status
+pp: 20
+priority: 0
+flags: {}
+volatileStatus: reflect
+condition: {}
+secondary: null
+target: self
+type: Psychic
+desc: >-
+  While the user remains active, its Defense is doubled when taking damage.
+  Critical hits ignore this protection. This effect can be removed by Haze.
+shortDesc: While active, the user's Defense is doubled.
+id: reflect
+fullname: 'move: Reflect'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Psychic
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: true
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false

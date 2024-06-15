@@ -1,0 +1,50 @@
+exists: true
+name: Sludge
+secondary: &ref_0
+  chance: 40
+  status: psn
+num: 124
+accuracy: 100
+basePower: 65
+category: Physical
+pp: 20
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+target: normal
+type: Poison
+contestType: Tough
+desc: Has a 40% chance to poison the target.
+shortDesc: 40% chance to poison the target.
+id: sludge
+fullname: 'move: Sludge'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Poison
+secondaries:
+  - *ref_0
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+noSketch: false
+maxMove:
+  basePower: 85
+zMove:
+  basePower: 120

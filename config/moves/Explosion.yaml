@@ -1,0 +1,51 @@
+exists: true
+name: Explosion
+basePower: 170
+target: normal
+noSketch: true
+num: 153
+accuracy: 100
+category: Physical
+pp: 5
+priority: 0
+flags:
+  protect: 1
+  mirror: 1
+  noparentalbond: 1
+selfdestruct: always
+secondary: null
+type: Normal
+contestType: Beautiful
+desc: >-
+  The user faints after using this move, unless this move broke the target's
+  substitute. The target's Defense is halved during damage calculation.
+shortDesc: Target's Def halved during damage. User faints.
+id: explosion
+fullname: 'move: Explosion'
+effectType: Move
+gen: 1
+isNonstandard: null
+noCopy: false
+affectsFainted: false
+sourceEffect: ''
+critRatio: 1
+baseMoveType: Normal
+secondaries: null
+hasSheerForce: false
+ignoreNegativeOffensive: false
+ignorePositiveDefensive: false
+ignoreOffensive: false
+ignoreDefensive: false
+ignoreImmunity: false
+noPPBoosts: false
+isZ: false
+isMax: false
+pressureTarget: ''
+nonGhostTarget: ''
+ignoreAbility: false
+spreadHit: false
+forceSTAB: false
+maxMove:
+  basePower: 150
+zMove:
+  basePower: 200
