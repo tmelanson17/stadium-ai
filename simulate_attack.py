@@ -97,7 +97,7 @@ def calc_move_damage(
 
 # Get % likelihood from ohko to 4hko
 def ko_odds(attacking: str, defending: str, attacking_boost: Boost, defending_boost: Boost,
-                     parser: pokemon_parser.PokemonParser, calc_strongest=False, calc_weakest=False, calc_last_resort=False) -> float:
+                     parser: pokemon_parser.PokemonParser, calc_last_resort=False) -> float:
     max_ohko=0
     max_2hko=0
     max_3hko=0
@@ -108,7 +108,7 @@ def ko_odds(attacking: str, defending: str, attacking_boost: Boost, defending_bo
         if not calc_last_resort and move_data.last_resort():
             continue
         damage = calc_move_damage(move_data, attacking, defending, attacking_boost, defending_boost, 
-                            parser, calc_strongest, calc_weakest) 
+                            parser, calc_strongest=True) 
         max_ohko = max(likelihood_ohko(damage, defending_hp, move_data.fixed_damage()), max_ohko)
         max_2hko = max(likelihood_2hko(damage, defending_hp, move_data.fixed_damage()), max_2hko)
         max_3hko = max(likelihood_3hko(damage, defending_hp, move_data.fixed_damage()), max_3hko)

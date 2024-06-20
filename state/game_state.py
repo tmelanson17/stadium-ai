@@ -1,6 +1,8 @@
 from attrs import define
 from enum import Enum
-from parse.pokemon_parser import Move
+from typing import List
+
+from parse.pokemon_parser import PokemonParser, Move, Stat
 from cv.text_match import StaticMessages, SecondLineMessages, SELF_AFFECT
 
 class Turn(Enum):
@@ -39,6 +41,7 @@ class PokemonState:
     volatile: VolatileStatus  = VolatileStatus.OK
     substitute: bool = False
     invulnerable: bool = False
+    recharge: bool = False
     boosts: dict[Stat, int] = {stat: 0 for stat in Stat}
 
     def reset(self):
@@ -46,6 +49,7 @@ class PokemonState:
         self.boosts = {stat: 0 for stat in Stat}
         self.substitute = False
         self.invulnerable = False
+        self.recharge = False
 
     def assess_faint(self):
         if self.hp == 0:
@@ -111,8 +115,6 @@ class GameState:
         p2_team[p2_pokemon_idx].assess_faint()
 
     def update_status(self, line1, line2, team1, idx1, team2, idx2):
-        print("Setting status")
-        print(line1, line1 in SELF_AFFECT)
         if line1 in SELF_AFFECT:
             team1[idx1].set_state(line1)
         # Not self affecting but also static message
@@ -131,6 +133,69 @@ class GameState:
     def update_p2_status(self, line1, line2):
         print("P2 , P1")
         self.update_status(line1, line2, self.p2_team, self.p2_pokemon_idx, self.p1_team, self.p1_pokemon_idx)
-                        
+
+    def print_active_pokemon_state(self, active_pk):
+        print(f"{active_pk.name}")
+        print(f"Status: {active_pk.status} - {active_pk.volatile}")
+        print(f"HP: {active_pk.hp}/{active_pk.full_hp}")
+        print(f"Invulnerable: {active_pk.invulnerable}, Sub: {active_pk.substitute}, Recharge: {active_pk.recharge}")
+        print(f"Boosts: {active_pk.boosts}")
+        print("Moves")
+        for move in active_pk.moves:
+            print(f"  - {move}")
+
+    def print_side_pokemon(self, hidden):
+        print(f"{hidden.name}")
+        print(f"Status: {hidden.status}")
+        print(f"HP: {hidden.hp}/{hidden.full_hp}")
+
+    def print_state(self):
+        print("==================")
+        print("Active Pokemon")
+        print("==================")
+        self.print_active_pokemon_state(self.p1_team[self.p1_pokemon_idx])
+        print("==================")
+        self.print_active_pokemon_state(self.p2_team[self.p2_pokemon_idx])
+        print("==================")
+        print("Full Teams")
+        print("==================")
+        for mon in self.p1_team:
+            self.print_side_pokemon(mon)
+        print("==================")
+        for mon in self.p2_team:
+            self.print_side_pokemon(mon)
 
 
+
+def create_pokemon_state(mon: str, pokemon_parser: PokemonParser):
+    pokemon_state = PokemonState()
+    pokemon_state.full_hp = pokemon_parser.get_stat(mon, Stat.HP)
+    pokemon_state.hp = pokemon_state.full_hp
+    pokemon_state.speed = pokemon_parser.get_stat(mon, Stat.SPD)
+    pokemon_state.moves = pokemon_parser.moveset(mon)
+    pokemon_state.name = mon
+    return pokemon_state
+
+
+def create_from_parser(team1: List[str], team2: List[str], pokemon_parser: PokemonParser):
+    team1_state = list()
+    for mon in team1:
+        team1_state.append(create_pokemon_state(mon, pokemon_parser))
+    active_idx=0
+    team2_state = list()
+    for mon in team2:
+        team2_state.append(create_pokemon_state(mon, pokemon_parser))
+    state = GameState(
+    p1_pokemon_idx = active_idx,
+    p2_pokemon_idx = active_idx,
+    p1_team = team1_state,
+    p2_team = team2_state)
+    return state
+
+
+if __name__ == "__main__":
+    parser = PokemonParser("config/pokemon.yaml")
+    game_state = create_from_parser(["Gengar", "Parasect", "Psyduck"],["Pikachu", "Venonat", "Gyarados"], parser)
+
+
+    game_state.print_state()

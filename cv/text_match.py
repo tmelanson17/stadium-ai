@@ -41,11 +41,12 @@ class StaticMessages(Enum):
     DIG = "It dug a hole!"
     FLY = "It flew up high!"
     CONF = "It's confused!"
+    SUCK = "It sucked HP!"
     STARTCONF = "It became confused!"
     STARTFRZ = "It was frozen solid!"
     STARTPLZ = "It may not attack!"
     STARTSLP = "It fell asleep!"
-    STARTBRN = "Burnburnburn" # TODO: What is the actual message
+    STARTBRN = "It was burned!" 
     STATUSFAIL = "But, it failed!"
     STATUSBRN = "Burnburnburn" # TODO: What is the actual message
     PLZ = "It's fully paralyzed!"
@@ -54,16 +55,32 @@ class StaticMessages(Enum):
     SLP = "It's fast asleep!"
     REST = "It fell asleep and was healed!"
     WOKE = "It woke up!" # TODO: Double check this one
+    ATK_G_INC = "ATTACK greatly increased!"
+    DEF_G_INC = "DEFENSE greatly increased!"
+    SPC_G_INC = "SPECIAL greatly increased!"
+    SPD_G_INC = "SPEED greatly increased!"
+    ATK_INC = "ATTACK increased!"
+    DEF_INC = "DEFENSE increased!"
+    SPC_INC = "SPECIAL increased!"
+    SPD_INC = "SPEED increased!"
+    SPECIAL_DOWN = "SPECIAL fell!"
+    SPEED_DOWN = "SPEED fell!"
+    DEFENSE_DOWN = "DEFENSE fell!"
+    ATTACK_DOWN = "ATTACK fell!"
 
 class SecondLineMessages(Enum):
     STARTFRZ = "It was frozen solid!"
     STARTPLZ = "It may not attack!"
-    STARTBRN = "Burnburnburn" # TODO: What is the actual message
+    STARTBRN = "It was burned!" 
     STATUSBRN = "Burnburnburn" # TODO: What is the actual message
     CRIT = "Critical hit!"
     REST = "It regained health!"
     CONF = "It's confused!"
     NOCONF = "It's no longer confused!"
+    SPECIAL_DOWN = "SPECIAL fell!"
+    SPEED_DOWN = "SPEED fell!"
+    DEFENSE_DOWN = "DEFENSE fell!"
+    ATTACK_DOWN = "ATTACK fell!"
 
 SELF_AFFECT = [StaticMessages.SWITCH1, StaticMessages.SWITCH2, StaticMessages.DIG, StaticMessages.FLY,
                StaticMessages.WOKE, StaticMessages.SLP, StaticMessages.PLZ, StaticMessages.FRZ, StaticMessages.REST,
@@ -85,6 +102,7 @@ def check_closest_message(textbox, pokemon_names, pokemon_config, max_distance =
         if distance < min_distance_so_far:
             min_distance_so_far = distance
             min_message = static_enum
+
     for pokemon in pokemon_names:
         pokemon_caps = pokemon.upper()
         for swap_in_message in swap_in:
