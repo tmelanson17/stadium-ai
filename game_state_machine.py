@@ -9,10 +9,10 @@ class GameState(Enum):
     EXECUTION=4
 
 LIGHT=150
-DARK=25
+DARK=45
 
 class GameStateMachine:
-    def __init__(self, state_change_threshold=2, cooldown=15):
+    def __init__(self, state_change_threshold=1, cooldown=15):
         self.state = GameState.PREGAME
         self.increment_threshold = state_change_threshold
         self.cooldown_threshold = cooldown
@@ -34,11 +34,11 @@ class GameStateMachine:
                 self.state = GameState.STARTING
         elif (self.state == GameState.STARTING or self.state == GameState.EXECUTION) and np.average(img) < DARK:
             self.i += 1
-            if self.i > self.increment_threshold:
+            if self.i >= self.increment_threshold:
                 self.cooldown = 1
                 self.state = GameState.DECISION
         elif (self.state == GameState.DECISION) and np.average(img) < DARK:
             self.i += 1
-            if self.i > self.increment_threshold:
+            if self.i >= self.increment_threshold:
                 self.cooldown = 1
                 self.state = GameState.EXECUTION

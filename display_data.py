@@ -38,6 +38,10 @@ p1_hp_h_range = ((73,92),(90,111),(110,129))
 p2_hp_v_range = (391,409)
 p2_hp_h_range = ((538,555),(555,575),(574,594))
 
+# Crop image to the actual screen
+def get_main_crop(img):
+    return img[113//2:777//2, 168//2:1210//2]
+
 # 0 if P1 , 1 if P2
 def message_box_color(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -124,7 +128,7 @@ def sobel_filter(frame):
 def check_point_equal(x1 : float, y1 : float, x2 : float, y2: float, thresh : float):
    return (x1-x2)**2 + (y1-y2)**2 < thresh**2
 
-def check_line_equal(line1 : tuple[float], line2 : tuple[float], thresh : float):
+def check_line_equal(line1, line2, thresh):
     x1,y1,x2,y2 = line1
     xp1,yp1,xp2,yp2 = line2
     return (

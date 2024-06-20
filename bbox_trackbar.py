@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 
 #cap = cv.imread("data/box_2.jpg")
-cap = cv.VideoCapture("data/freebattle_small.mkv")
+cap = cv.VideoCapture(0) #"data/freebattle_small.mkv")
 if not cap.isOpened():
  print("Cannot open camera")
  exit()

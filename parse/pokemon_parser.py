@@ -1,12 +1,11 @@
 import os
 import yaml
 from enum import Enum
+from typing import List, Tuple
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
-
-Moveset = list[str]
 
 class Stat(Enum):
     HP=0
@@ -65,19 +64,19 @@ class PokemonParser:
     def level(self, pokemon: str) -> int:
         return self.yaml[pokemon]["level"]
 
-    def moveset(self, pokemon: str) -> Moveset:
+    def moveset(self, pokemon: str) -> List[str]:
         return self.yaml[pokemon]["moves"]
 
-    def get_pokemon_names(self) -> list[str]:
+    def get_pokemon_names(self) -> List[str]:
         return [pokemon for pokemon in self.yaml]
 
-    def get_stats(self, pokemon) -> list[int]:
+    def get_stats(self, pokemon) -> List[int]:
         return self.yaml[pokemon]["stats"]
 
     def get_stat(self, pokemon, stat: Stat) -> int:
         return self.yaml[pokemon]["stats"][stat.value]
 
-    def type(self, pokemon) -> tuple[str, str]:
+    def type(self, pokemon) -> Tuple[str, str]:
         if type(self.yaml[pokemon]["type"]) == str:
             return self.yaml[pokemon]["type"], None
         else:

@@ -2,6 +2,7 @@ from attrs import define
 from enum import Enum
 from parse.pokemon_parser import Move
 from cv.text_match import StaticMessages, SecondLineMessages, SELF_AFFECT
+from typing import List, Tuple, Dict
 
 class Turn(Enum):
     P1=0
@@ -35,11 +36,11 @@ class PokemonState:
     speed: int = 0
     status: Status = Status.OK
     name: str = ""
-    moves: list[Move] = []
+    moves: List[Move] = []
     volatile: VolatileStatus  = VolatileStatus.OK
     substitute: bool = False
     invulnerable: bool = False
-    boosts: dict[Stat, int] = {stat: 0 for stat in Stat}
+    boosts: Dict[Stat, int] = {stat: 0 for stat in Stat}
 
     def reset(self):
         self.volatile = VolatileStatus.OK
@@ -84,8 +85,8 @@ def create_game_state():
 class GameState:
     p1_pokemon_idx: int
     p2_pokemon_idx: int
-    p1_team: list[PokemonState] 
-    p2_team: list[PokemonState]
+    p1_team: List[PokemonState] 
+    p2_team: List[PokemonState]
 
     def init(self):
         for p in self.p1_team:
@@ -93,7 +94,7 @@ class GameState:
         for p in self.p2_team:
             p.reset()
 
-    def get_active_pokemon(self) -> tuple[PokemonState]:
+    def get_active_pokemon(self) -> Tuple[PokemonState]:
         return (p1_team[p1_pokemon_idx], p2_team[p2_pokemon])
 
     def swap_p1_pokemon(self, i_switchin):

@@ -13,7 +13,8 @@ def find_hp(img, p1):
         hp_boxes = display_data.get_p1_hp_range(img)
     else:
         hp_boxes = display_data.get_p2_hp_range(img)
-    
+
+    hp=0
     for i,hp_box in enumerate(hp_boxes):
         text = filter_text(hp_box, display_data.min_text, display_data.max_text)
 
@@ -21,11 +22,17 @@ def find_hp(img, p1):
             continue
         cv2.imwrite(f"box_number_{i}.png", text)
         hp_digit = reader.single_infer(text)
-        print(hp_digit)
+        hp = hp*10 + hp_digit
+
+    print(hp)
     print("===")
+    return hp
  
 if __name__ == "__main__":
- cap = cv2.VideoCapture("data/freebattle_small.mkv")
+ cap = cv2.VideoCapture(0) # "data/freebattle_small.mkv")
+ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+ cap.set(cv2.CAP_PROP_FPS, 30)
  if not cap.isOpened():
   print("Cannot open camera")
   exit()
@@ -66,48 +73,48 @@ if __name__ == "__main__":
   #else:
   #    cv2.imshow('mask', frame)
  
-  machine.check_state(img)
-  ## BLUE if starting
-  #if machine.state == GameState.STARTING:
-  # img[:,:,0] = 255
-  ## RED if deciding
-  #elif machine.state == GameState.DECISION:
-  # img[:,:,2] = 255
-  ## GREEN if executing
-  #elif machine.state == GameState.EXECUTION:
-  # img[:,:,1] = 255
-  if machine.state == GameState.STARTING or machine.state == GameState.EXECUTION:
-    if box_fitter.check_lines(img):
-      quote_text_box = display_data.crop_bbox(img, display_data.quote_bbox)
-      color = display_data.message_box_color(quote_text_box)
-      text = filter_text(quote_text_box, display_data.min_text, display_data.max_text)
-      display_data.set_bbox(img, display_data.quote_bbox, text)
-      turn = game_state.Turn.P1 if color == display_data.Color.P1 else game_state.Turn.P2
-      if not box_active:
-          box_active=True
-          queue.add_image_to_processing(text, turn)
-    else:
-      box_active=False
-  else:
-      box_active=False
-  results = queue.check()
-  for r in results:
-      text, turn = r
-      if turn == game_state.Turn.P1:
-          state.update_p1_status(text[0], text[1])
-      else:
-          state.update_p2_status(text[0], text[1])
+  machine.check_state(display_data.get_main_crop(img))
+  # BLUE if starting
+  if machine.state == GameState.STARTING:
+   img[:,:,0] = 255
+  # RED if deciding
+  elif machine.state == GameState.DECISION:
+   img[:,:,2] = 255
+  # GREEN if executing
+  elif machine.state == GameState.EXECUTION:
+   img[:,:,1] = 255
+  #if machine.state == GameState.STARTING or machine.state == GameState.EXECUTION:
+  #  if box_fitter.check_lines(img):
+  #    quote_text_box = display_data.crop_bbox(img, display_data.quote_bbox)
+  #    color = display_data.message_box_color(quote_text_box)
+  #    text = filter_text(quote_text_box, display_data.min_text, display_data.max_text)
+  #    display_data.set_bbox(img, display_data.quote_bbox, text)
+  #    turn = game_state.Turn.P1 if color == display_data.Color.P1 else game_state.Turn.P2
+  #    if not box_active:
+  #        box_active=True
+  #        queue.add_image_to_processing(text, turn)
+  #  else:
+  #    box_active=False
+  #else:
+  #    box_active=False
+  #results = queue.check()
+  #for r in results:
+  #    text, turn = r
+  #    if turn == game_state.Turn.P1:
+  #        state.update_p1_status(text[0], text[1])
+  #    else:
+  #        state.update_p2_status(text[0], text[1])
     
  
   if machine.state == GameState.DECISION:
     decision_frame+=1
   else:
     decision_frame=0
-  if decision_frame < DECISION_DELAY + 2 and decision_frame > DECISION_DELAY:
-    print("P1:")
-    find_hp(img, p1=True)
-    print("P2:")
-    find_hp(img, p1=False)
+  #if decision_frame < DECISION_DELAY + 2 and decision_frame > DECISION_DELAY:
+  #  print("P1:")
+  #  find_hp(img, p1=True)
+  #  print("P2:")
+  #  find_hp(img, p1=False)
  
      
   #rng = display_data.either_in_range(img)
@@ -121,8 +128,8 @@ if __name__ == "__main__":
  
   
   cv2.imshow("img", img)
-  hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-  cv2.imshow("v", hsv[:,:,2])
+  #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+  #cv2.imshow("v", hsv[:,:,2])
   #cv2.imshow("sobel", sbl)
  
   if cv2.waitKey(1) == ord('q'):

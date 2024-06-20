@@ -1,21 +1,9 @@
 import cv2
-import pytesseract
 import subprocess
 import io
 import pickle
 from cv.text_match import check_closest_message
 from parse import pokemon_parser
-
-def process_image(cls, img):
-    text = pytesseract.image_to_string(img) #, config=...)
-    #print("Input :")
-    #print(text)
-    line1, line2 = check_closest_message(text, cls.config)
-    #print("Parsed :")
-    #print(line1)
-    #print(line2)
-    #print("================")
-    
 
 class TesseractQueue:
     def __init__(self):
