@@ -8,8 +8,8 @@ import asyncio
 import numpy as np
 import time
 
+from src.state.pokestate import PokemonState
 from src.state_reader.condition_reader import read_text_from_roi
-# from src.state.pokestate import BattleState
 from src.state_reader.phrases import is_update_message, Messages
 
 class PlayerID(Enum):
@@ -113,34 +113,6 @@ class ContinuousTask(Generic[Input]):
         await self._queue.join()
         print("All items processed.")
 
-@dataclass
-class BattleState:
-    p1_hp: int = 0
-    p1_condition: Optional[str] = None
-    p2_hp : int = 0
-    p2_condition: Optional[str] = None
-
-    def __init__(self):
-        self.p1_hp = 100
-        self.p2_hp = 100
-        self.p1_condition = None
-        self.p2_condition = None
-
-''' 
-    Updates the BattleState [TODO] asynchronously.
-    Can pass updates to the BattleState, then call get_state() to retrieve the current state.
-'''
-class BattleStateUpdate:
-    def __init__(self):
-        # TODO: Update with real battle state
-        self.state = BattleState() 
-
-    def handle_update(self, attribute: str, value: Any):
-        print(f"Updating {attribute} to {value}")
-        self.state.__setattr__(attribute, value)
-    
-    def get_state(self) -> BattleState:
-        return self.state
 '''
 
     Stub for BattleCondition reader.
@@ -151,17 +123,9 @@ class BattleConditionReader:
         Update the battle condition based on the condition message.
     '''
     def update_condition(self, battle_state: BattleStateUpdate, message: Messages, pid: PlayerID) -> None:
-        '''
-        Updates the battle condition based on the message and player ID.
-        This is a stub method that should be implemented with actual logic.
-        '''
-        print(f"Updating condition for {pid} with message: {message}")
-        # Here you would implement the logic to update the battle state
-        # based on the message and player ID.
-        # For now, we just print the message.
-        if message == Messages.STARTPSN:
-            print(f"Player {pid} is badly poisoned.")
-            battle_state.handle_update(f"{pid.name.lower()}_condition", "badly poisoned")
+        battle_state.lock_state()
+        phrases.parse_update_message(message, battle_state.get_active_pokemon(pid))
+        battle_state.unlock_state()
         
 
     
@@ -191,7 +155,7 @@ class BattleConditionReader:
                 continue
             print(f"Condition detected for {player_id}: {text.value}")
             if text.value is not None and is_update_message(text):
-                battle_state.handle_update(f"{player_id}_condition", text.value)
+                update_condition(battle_state, text, player_id)
         
 
 

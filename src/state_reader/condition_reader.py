@@ -1,9 +1,33 @@
+"""
+Battle message parsing and state updating system.
+
+This module provides functions to:
+1. Parse battle messages from text using OCR
+2. Convert recognized messages into state changes
+3. Apply those changes to the battle state
+
+Key Functions:
+- parse_update_message: Parse a string message into state changes
+- enact_changes: Apply parsed changes to a BattleState
+- process_battle_messages: Complete pipeline from image to state updates
+
+Example Usage:
+    # Parse a single message
+    changes = parse_update_message("It became confused!", battle_state, opponent=True)
+    enact_changes(battle_state, changes, opponent=True)
+    
+    # Process messages from image
+    messages = process_battle_messages(image, roi, battle_state, opponent=False)
+"""
+
 import cv2
 import numpy as np
 import pytesseract
 from typing import List, Tuple, Optional, Union
 
-from src.state_reader.phrases import Messages
+from src.state_reader.phrases import Messages, parse_update_message
+from src.state_reader.state_updater import enact_changes
+from src.state.pokestate import BattleState
 
 
 def levenshtein_distance(s: str, t: str) -> int:
@@ -91,7 +115,7 @@ def read_text_from_roi(
             print(f"PyTesseract result: {text}")
         
             if not text:
-                return None
+                continue
            
             # Find closest match
             matches.append(find_closest_phrase(text, threshold)) 
@@ -100,7 +124,7 @@ def read_text_from_roi(
         
     except Exception as e:
         print(f"Error reading text with Tesseract: {e}")
-        return None
+        return []
 
 
 def preprocess_for_ocr(image: np.ndarray) -> np.ndarray:
@@ -191,7 +215,4 @@ def find_closest_phrase(
     
     # Return match only if within threshold
     return best_match if min_distance <= threshold else None
-
-
-
 

@@ -2,12 +2,10 @@ from dataclasses import dataclass
 import enum
 from typing import Optional, List
 
-from gymnasium.spaces import Space, Box, Tuple
-from gymnasium.spaces.utils import flatten_space
-
 import numpy as np
-import gen1_moves as moves
-import gen1_dex as dex
+import src.state.gen1_moves as moves
+import src.state.gen1_dex as dex
+from src.state.pokestate_defs import Status
 
 @dataclass
 class MoveState:
@@ -34,34 +32,6 @@ class MoveState:
     def length() -> int:
         return 4 + len(moves.GEN1_MOVES)
     
-    @staticmethod
-    def observation_space() -> Space:
-        """
-        Returns the observation space for a MoveState.
-        
-        The observation space consists of:
-        - 1 float for known (0 or 1)
-        - 1 int for current PP
-        - 1 int for max PP
-        - 1 float for disabled (0 or 1)
-        - len(moves.GEN1_MOVES) floats for move names (one-hot encoded)
-        
-        Returns:
-            Space: The observation space for MoveState
-        """
-        low = np.array([
-            0, # Known
-            0, # Current PP
-            0, # Max PP
-            0, # Disabled
-        ] + [0] * len(moves.GEN1_MOVES), dtype=np.float32)  # One-hot encoded moves
-        high = np.array([
-            1, # Known (0 or 1)
-            64, # Current PP (max 64)
-            64, # Max PP (max 64)
-            1, # Disabled (0 or 1)
-        ] + [1] * len(moves.GEN1_MOVES), dtype=np.float32)  # One-hot encoded moves (0 or 1)
-        return Box(low=low, high=high, shape=(MoveState.length(),), dtype=np.float32)
         
     @staticmethod
     def from_numpy(obs: np.ndarray, start_idx: int = 0) -> 'MoveState':
@@ -95,16 +65,6 @@ class MoveState:
             disabled=disabled
         )
 
-
-class Status(enum.Enum):
-    NONE = 0
-    POISON = 1
-    BURN = 2
-    PARALYSIS = 3
-    SLEEP = 4
-    FREEZE = 5
-    FAINTED = 6
-
 @dataclass
 class PokemonState:
     active: bool = False # Whether the pokemon is currently active in battle
@@ -112,6 +72,7 @@ class PokemonState:
     revealed: bool = False # Whether the Pokemon in this slot has been revealed to the opponent
     in_play: bool = False # True if brought to the battle
     level: int = 0 # Level of the Pokemon
+    name: Optional[str] = None # Nickname
     species: Optional[str] = None # Species name
     type1: Optional[str] = None # Species type 1,2
     type2: Optional[str] = None
@@ -174,79 +135,6 @@ class PokemonState:
     def length() -> int:
         return 16 + MoveState.length() * 4 + len(dex.GEN1_POKEMON) + len(dex.TYPES)
     
-    @staticmethod
-    def observation_space() -> Space:
-        """
-        Returns the observation space for a PokemonState.
-
-        The observation space consists of:
-        - 1 float for active (0 or 1)
-        - 1 float for known (0 or 1)
-        - 1 float for revealed (0 or 1)
-        - 1 float for in_play (0 or 1)
-        - 1 int for level
-        - 1 float for HP (0-100)
-        - 1 int for status (0-6)
-        - 1 float for trapped (0 or 1)
-        - 1 float for two_turn_move (0 or 1)
-        - 1 float for confused (0 or 1)
-        - 1 int for sleep_turns
-        - 1 float for substitute (0 or 1)
-        - 4 ints for boosts (atk, def, special, speed)
-        - len(dex.GEN1_POKEMON) floats for species (one-hot encoded)
-        - len(dex.TYPES) floats for types (one-hot encoded)
-        - MoveState observations
-
-        Returns:
-            Space: The observation space for PokemonState
-        """
-        low = np.array([
-            0, # Active
-            0, # Known
-            0, # Revealed
-            0, # In play
-            0, # Level
-            0, # HP
-            Status.NONE.value, # Status
-            0, # Trapped
-            0, # Two-turn move
-            0, # Confused
-            0, # Sleep turns
-            0, # Substitute
-            -6, # Atk boost (-6 to +6)
-            -6, # Def boost (-6 to +6)
-            -6, # Special boost (-6 to +6)
-            -6, # Speed boost (-6 to +6)
-        ] + [0] * len(dex.GEN1_POKEMON) + [0] * len(dex.TYPES), dtype=np.float32)
-        
-        high = np.array([
-            1, # Active (0 or 1)
-            1, # Known (0 or 1)
-            1, # Revealed (0 or 1)
-            1, # In play (0 or 1)
-            100,
-            100, # Level (0-100)
-            Status.FAINTED.value, # Status (0-6)
-            1, # Trapped (0 or 1)
-            1, # Two-turn move (0 or 1)
-            1, # Confused (0 or 1)
-            7, # Sleep turns (0-7)
-            1, # Substitute (0 or 1)
-            6, # Atk boost (0 to +6)
-            6, # Def boost (0 to +6)
-            6, # Special boost (0 to +6)
-            6, # Speed boost (0 to +6)
-        ] + [1] * len(dex.GEN1_POKEMON) + [1] * len(dex.TYPES) , dtype=np.float32)
-
-        return flatten_space(Tuple(
-            (Box(
-            low=np.array(low, dtype=np.float32),
-            high=np.array(high, dtype=np.float32),
-            shape=(PokemonState.length() - MoveState.length() * 4,),
-            dtype=np.float32),
-        ) + tuple(MoveState.observation_space() for  _ in range(4))
-        ))
-        
     @staticmethod
     def from_numpy(obs: np.ndarray, start_idx: int = 0) -> 'PokemonState':
         """
@@ -345,23 +233,6 @@ class TeamState:
     def length(self) -> int:
         return len(self.pk_list) * PokemonState.length()
 
-    @staticmethod
-    def observation_space(team_size: int = 6) -> Space:
-        """
-        Returns the observation space for a TeamState.
-
-        The observation space consists of:
-        - PokemonState observations for each Pokemon in the team
-
-        Args:
-            team_size: Number of Pokemon in the team (default is 6)
-
-        Returns:
-            Space: The observation space for TeamState
-        """
-        return flatten_space(Tuple(tuple(
-            PokemonState.observation_space() for _ in range(team_size)
-        )))
         
     @staticmethod
     def from_numpy(obs: np.ndarray, start_idx: int = 0, team_size: int = 6) -> 'TeamState':
@@ -411,31 +282,6 @@ class BattleState:
     
 
     @staticmethod
-    def observation_space(team_size: int = 6) -> Space:
-        """
-        Returns the observation space for a BattleState.
-
-        The observation space consists of:
-        - 1 int for player active mon index
-        - 1 int for opponent active mon index
-        - TeamState observation for player team
-        - TeamState observation for opponent team
-
-        Args:
-            team_size: Number of Pokemon in each team (default is 6)
-
-        Returns:
-            Space: The observation space for BattleState
-        """
-        return flatten_space(Tuple((
-            Box(low=0, high=team_size-1, shape=(1,), dtype=np.float32),  # Player active mon index
-            Box(low=0, high=team_size-1, shape=(1,), dtype=np.float32),  # Opponent active mon index
-            TeamState.observation_space(team_size),
-            TeamState.observation_space(team_size)
-        )))
-        
-
-    @staticmethod
     def from_numpy(obs: np.ndarray, start_idx: int = 0, team_size: int = 6) -> 'BattleState':
         """
         Convert a numpy observation array back into a BattleState
@@ -464,10 +310,12 @@ class BattleState:
             opponent_team=opponent_team
         )
 
-# TODO: Create a default BattleState with example teams / mons
-state = BattleState(    
-    player_active_mon=0,
-    opponent_active_mon=0,
-    player_team=TeamState(pk_list=[PokemonState() for _ in range(6)]),
-    opponent_team=TeamState(pk_list=[PokemonState() for _ in range(6)])
-)
+
+if __name__ == "__main__":
+    # TODO: Create a default BattleState with example teams / mons
+    state = BattleState(    
+        player_active_mon=0,
+        opponent_active_mon=0,
+        player_team=TeamState(pk_list=[PokemonState() for _ in range(6)]),
+        opponent_team=TeamState(pk_list=[PokemonState() for _ in range(6)])
+    )
