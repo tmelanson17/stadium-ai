@@ -30,52 +30,36 @@ from src.state_reader.state_updater import enact_changes
 from src.state.pokestate import BattleState
 
 
-def levenshtein_distance(s: str, t: str) -> int:
+def update_state(
+   raw_text: List[Optional[str]],
+   battle_state: BattleState,
+   opponent: bool = False
+) -> None:
     """
-    Calculate the Levenshtein distance between two strings.
+    Update the battle state based on recognized text from an image.
     
     Args:
-        s: First string
-        t: Second string
+        raw_text: List of recognized text lines from the image
+        battle_state: The current battle state to update
+        opponent: Whether the opponent executed the move (True) or player (False)
         
     Returns:
-        The Levenshtein distance between the strings
+        None
     """
-    m = len(s)
-    n = len(t)
-    # Create a matrix to store distances
-    d = [[0] * (n + 1) for _ in range(m + 1)]
-    
-    # Initialize first row and column
-    for i in range(1, m + 1):
-        d[i][0] = i
-    for j in range(1, n + 1):
-        d[0][j] = j
-    
-    # Fill the matrix
-    for j in range(1, n + 1):
-        for i in range(1, m + 1):
-            if s[i-1] == t[j-1]:
-                substitution_cost = 0
-            else:
-                substitution_cost = 1
-                
-            d[i][j] = min(
-                d[i-1][j] + 1,                      # deletion
-                d[i][j-1] + 1,                      # insertion
-                d[i-1][j-1] + substitution_cost     # substitution
-            )
-    
-    return d[m][n]
-
+    for text in raw_text:
+        if text is None:
+            continue
+        print(f"Processing text: {text}")
+        changes = parse_update_message(text, battle_state, opponent=opponent)
+        if changes:
+            enact_changes(battle_state, changes, opponent=opponent)
 
 def read_text_from_roi(
     image: np.ndarray,
     roi: Tuple[Tuple[int, int], Tuple[int, int]],
-    threshold: int = 5,
     tesseract_config: str = "--oem 1 --psm 6 -l eng",
     preprocess: bool = True
-) -> List[Optional[Messages]]:
+) -> List[Optional[str]]:
     """
     Read text from a specific region of interest (ROI) in an image using Tesseract,
     then find the closest match from a list of phrases.
@@ -118,7 +102,7 @@ def read_text_from_roi(
                 continue
            
             # Find closest match
-            matches.append(find_closest_phrase(text, threshold)) 
+            matches.append(text) 
 
         return matches
         
@@ -176,43 +160,4 @@ def preprocess_for_ocr(image: np.ndarray) -> np.ndarray:
     # cleaned = resized
     
     return cleaned
-
-
-def find_closest_phrase(
-    text: str, 
-    threshold: int = 5
-) -> Optional[Messages]:
-    """
-    Find the closest matching phrase using Levenshtein distance.
-    
-    Args:
-        text: The text to match against
-        phrases: List of candidate phrases
-        threshold: Maximum distance allowed for a match
-        
-    Returns:
-        The closest matching phrase if distance <= threshold, None otherwise
-    """
-    if not text:
-        return None
-    
-    # Normalize text for comparison (uppercase, strip whitespace)
-    normalized_text = text.upper().strip()
-    
-    min_distance = threshold + 1
-    best_match = None
-    
-    for phrase in Messages:
-        # Normalize phrase for comparison
-        normalized_phrase = phrase.value.upper().strip()
-        
-        # Calculate Levenshtein distance
-        distance = levenshtein_distance(normalized_text, normalized_phrase)
-        
-        if distance < min_distance:
-            min_distance = distance
-            best_match = phrase
-    
-    # Return match only if within threshold
-    return best_match if min_distance <= threshold else None
 

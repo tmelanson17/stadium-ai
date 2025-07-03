@@ -2,15 +2,16 @@ from asyncio import Queue
 from copy import copy
 from dataclasses import dataclass
 from enum import Enum
-from typing import TypeVar, Generic, Optional, Callable, AnyStr, Any, Tuple
+from typing import TypeVar, Generic, Optional, Callable, Awaitable, Tuple
 
 import asyncio
 import numpy as np
 import time
 
-from src.state.pokestate import PokemonState
+from src.state.pokestate import BattleState, PokemonState, create_default_battle_state
 from src.state_reader.condition_reader import read_text_from_roi
-from src.state_reader.phrases import is_update_message, Messages
+from src.state_reader.phrases import parse_update_message, Messages
+from src.state_reader.state_updater import enact_changes
 
 class PlayerID(Enum):
     P1 = 0
@@ -69,7 +70,7 @@ class ImageUpdate:
 '''  
 Input = TypeVar('Input')
 class ContinuousTask(Generic[Input]):
-    def __init__(self, queue: Queue[Input], task_fn: Callable[[Input], None]):
+    def __init__(self, queue: Queue[Input], task_fn: Callable[[Input], Awaitable[None]]):
         self._task_fn = task_fn 
         self._queue = queue
         self._loop = asyncio.create_task(self.run())
@@ -78,7 +79,7 @@ class ContinuousTask(Generic[Input]):
         try:
             while not self._queue.empty():
                 item = await self._queue.get()
-                self._task_fn(item)
+                await self._task_fn(item)
                 self._queue.task_done()
                 await asyncio.sleep(0.1)  # Adjust the sleep time as needed
         except asyncio.CancelledError:
@@ -112,6 +113,34 @@ class ContinuousTask(Generic[Input]):
         '''
         await self._queue.join()
         print("All items processed.")
+'''
+    Wrapper for BattleState to handle updates and locking.
+'''
+class BattleStateUpdate:
+    def __init__(self, battle_state: Optional[BattleState] = None):
+        if battle_state is None:
+            self._state = create_default_battle_state()
+        else:
+            self._state = battle_state
+        self._lock = asyncio.Lock()
+
+    async def lock_state(self):
+        await self._lock.acquire()
+
+    def unlock_state(self):
+        self._lock.release()
+
+    def get_active_pokemon(self, player_id: PlayerID) -> PokemonState:
+        if player_id == PlayerID.P1:
+            return self._state.player_team.pk_list[self._state.player_active_mon]
+        elif player_id == PlayerID.P2:
+            return self._state.opponent_team.pk_list[self._state.opponent_active_mon]
+        else:
+            raise ValueError(f"Invalid player ID: {player_id}")
+
+    def get_state(self) -> BattleState:
+        return self._state
+
 
 '''
 
@@ -122,9 +151,17 @@ class BattleConditionReader:
     '''
         Update the battle condition based on the condition message.
     '''
-    def update_condition(self, battle_state: BattleStateUpdate, message: Messages, pid: PlayerID) -> None:
-        battle_state.lock_state()
-        phrases.parse_update_message(message, battle_state.get_active_pokemon(pid))
+    async def update_condition(self, battle_state: BattleStateUpdate, message: str, pid: PlayerID) -> None:
+        opponent = pid != PlayerID.P1
+        await battle_state.lock_state()
+        state = battle_state.get_state()
+        change = parse_update_message(message, state, opponent)
+        if change is None:
+            print(f"No change parsed from message: {message}")
+        else:
+            print(f"Applying change: {change} for player {pid}")
+            # Apply the changes to the battle state
+            enact_changes(state, change, opponent)
         battle_state.unlock_state()
         
 
@@ -133,7 +170,7 @@ class BattleConditionReader:
         Reads the battle condition from the image within the specified ROI.
         Returns a string representation of the condition or None if not applicable.
     '''
-    def handle_condition_update(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
+    async def handle_condition_update(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
         '''
         Reads the battle condition from the image within the specified ROI.
         '''
@@ -143,19 +180,16 @@ class BattleConditionReader:
         if update.player_id == PlayerID.INVALID:
             print("Invalid player ID, skipping condition update.")
             return
-        player_id = update.player_id.name.lower()
         updates = read_text_from_roi(
             update.image, 
             update.roi.to_coord(), 
-            threshold=3
         )
         for text in updates:
             if text is None:
                 print("Skipping None text update.")
                 continue
-            print(f"Condition detected for {player_id}: {text.value}")
-            if text.value is not None and is_update_message(text):
-                update_condition(battle_state, text, player_id)
+            print(f"Condition detected for {update.player_id.value}: {text}")
+            await self.update_condition(battle_state, text, update.player_id)
         
 
 
@@ -163,7 +197,7 @@ class BattleConditionReader:
     Stub for reading the player HP.
 '''
 class PlayerHPReader:
-    def update_hp(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
+    async def update_hp(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
         '''
         Reads the player HP from the image within the specified ROI.
         Returns an integer representation of the HP or None if not applicable.
@@ -175,7 +209,10 @@ class PlayerHPReader:
             print("Invalid player ID, skipping HP update.")
             return None
         player_id = update.player_id.name.lower()
-        battle_state.handle_update(f"{player_id}_hp", 100)  # Stub value, replace with actual logic
+        await battle_state.lock_state()
+        battle_state.get_state().player_team.pk_list[battle_state.get_state().player_active_mon].hp = 100  # Stub value, replace with actual logic
+        print(f"Updated {player_id} HP to 100")  # Stub value, replace with actual logic
+        battle_state.unlock_state()
 
     
 '''
@@ -184,18 +221,18 @@ class PlayerHPReader:
     TODO: Add more complex state-dependent logic.
 '''
 class StateReader:
-    def __init__(self):
-        self.state = BattleStateUpdate()
+    def __init__(self, initial_state: Optional[BattleState] = None):
+        self.state = BattleStateUpdate(initial_state)
         self.condition_reader = BattleConditionReader()
         self.hp_reader = PlayerHPReader()
 
-    def handle_update(self, update: ImageUpdate):
+    async def handle_update(self, update: ImageUpdate):
         # This method should handle the update and modify the internal state accordingly
         time.sleep(1)
         if update.stadium_mode == StadiumMode.EXECUTE:
-            self.condition_reader.handle_condition_update(self.state, update)
+            await self.condition_reader.handle_condition_update(self.state, update)
         elif update.stadium_mode == StadiumMode.CHOOSE_MOVE:
-            self.hp_reader.update_hp(self.state, update)
+            await self.hp_reader.update_hp(self.state, update)
         
 
     def get_state(self) -> BattleState:
@@ -206,9 +243,9 @@ class StateReader:
     Main interface for managing the queue of ImageUpdates.
 '''
 class UpdateQueue():
-    def __init__(self):
+    def __init__(self, battle_state: Optional[BattleState] = None):
         self.queue: Queue[ImageUpdate] = Queue()
-        self.state_reader: StateReader = StateReader()
+        self.state_reader: StateReader = StateReader(battle_state)
         self.processor = ContinuousTask(self.queue, self.state_reader.handle_update)
 
     async def put(self, item : ImageUpdate):

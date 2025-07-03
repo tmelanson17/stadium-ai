@@ -83,6 +83,8 @@ class PokemonState:
     confused: bool = False # Whether the Pokemon is currently confused
     sleep_turns: int = 0 # Number of turns asleep (0 if not asleep)
     substitute : bool = False # Whether the Pokemon has a substitute active
+    reflect: bool = False # Gen 1 reflect
+    light_screen: bool = False # Gen 1 light screen
     atk_boost : int = 0 # Number of boosts / debuffs
     def_boost : int = 0
     special_boost : int = 0
@@ -105,26 +107,29 @@ class PokemonState:
         result[start_idx + 9] = 1 if self.confused else 0
         result[start_idx + 10] = self.sleep_turns
         result[start_idx + 11] = 1 if self.substitute else 0
-        result[start_idx + 12] = self.atk_boost
-        result[start_idx + 13] = self.def_boost
-        result[start_idx + 14] = self.special_boost
-        result[start_idx + 15] = self.speed_boost
+        result[start_idx + 12] = 1 if self.reflect else 0
+        result[start_idx + 13] = 1 if self.light_screen else 0
+        result[start_idx + 14] = self.atk_boost
+        result[start_idx + 15] = self.def_boost
+        result[start_idx + 16] = self.special_boost
+        result[start_idx + 17] = self.speed_boost
+        last_flag_idx = 18
         if self.species:
-            result[start_idx + 16 + dex.get_species_index_by_name(self.species)] = 1
+            result[start_idx + last_flag_idx + dex.get_species_index_by_name(self.species)] = 1
         if self.type1:
-            result[start_idx + 16 + len(dex.GEN1_POKEMON) + dex.get_type_index_by_name(self.type1)] = 1
+            result[start_idx + last_flag_idx + len(dex.GEN1_POKEMON) + dex.get_type_index_by_name(self.type1)] = 1
         if self.type2:
-            result[start_idx + 16 + len(dex.GEN1_POKEMON) + dex.get_type_index_by_name(self.type2)] = 1
+            result[start_idx + last_flag_idx + len(dex.GEN1_POKEMON) + dex.get_type_index_by_name(self.type2)] = 1
         
 
         if self.move1:
-            self.move1.insert_numpy(result, start_idx + 16 + len(dex.GEN1_POKEMON) + len(dex.TYPES))
+            self.move1.insert_numpy(result, start_idx + last_flag_idx + len(dex.GEN1_POKEMON) + len(dex.TYPES))
         if self.move2:
-            self.move2.insert_numpy(result, start_idx + 16 + len(dex.GEN1_POKEMON) + len(dex.TYPES) + MoveState.length())
+            self.move2.insert_numpy(result, start_idx + last_flag_idx + len(dex.GEN1_POKEMON) + len(dex.TYPES) + MoveState.length())
         if self.move3:
-            self.move3.insert_numpy(result, start_idx + 16 + len(dex.GEN1_POKEMON) + len(dex.TYPES) + MoveState.length()*2)
+            self.move3.insert_numpy(result, start_idx + last_flag_idx + len(dex.GEN1_POKEMON) + len(dex.TYPES) + MoveState.length()*2)
         if self.move4:
-            self.move4.insert_numpy(result, start_idx + 16 + len(dex.GEN1_POKEMON) + len(dex.TYPES) + MoveState.length()*3)
+            self.move4.insert_numpy(result, start_idx + last_flag_idx + len(dex.GEN1_POKEMON) + len(dex.TYPES) + MoveState.length()*3)
 
     def to_numpy(self) -> np.ndarray:
         result = np.zeros(PokemonState.length(), dtype=np.float32)
@@ -133,7 +138,7 @@ class PokemonState:
     
     @staticmethod
     def length() -> int:
-        return 16 + MoveState.length() * 4 + len(dex.GEN1_POKEMON) + len(dex.TYPES)
+        return 18 + MoveState.length() * 4 + len(dex.GEN1_POKEMON) + len(dex.TYPES)
     
     @staticmethod
     def from_numpy(obs: np.ndarray, start_idx: int = 0) -> 'PokemonState':
@@ -160,22 +165,26 @@ class PokemonState:
         confused = bool(obs[start_idx + 9] > 0.5)
         sleep_turns = int(obs[start_idx + 10])
         substitute = bool(obs[start_idx + 11] > 0.5)
-        atk_boost = int(obs[start_idx + 12])
-        def_boost = int(obs[start_idx + 13])
-        special_boost = int(obs[start_idx + 14])
-        speed_boost = int(obs[start_idx + 15])
+        reflect = bool(obs[start_idx + 12] > 0.5)
+        light_screen = bool(obs[start_idx + 13] > 0.5)
+        # Stat boosts
+        atk_boost = int(obs[start_idx + 14])
+        def_boost = int(obs[start_idx + 15])
+        special_boost = int(obs[start_idx + 16])
+        speed_boost = int(obs[start_idx + 17])
         
         # Get species
+        last_flag_idx = 18
         species = None
-        species_indices = obs[start_idx + 16:start_idx + 16 + len(dex.GEN1_POKEMON)]
+        species_indices = obs[start_idx + last_flag_idx:start_idx + last_flag_idx + len(dex.GEN1_POKEMON)]
         if np.any(species_indices > 0.5):
             species_idx = np.argmax(species_indices)
-            species = dex.get_species_name_by_index(species_idx)
+            species = dex.get_species_name_by_index(int(species_idx))
             
         # Get types
         type1 = None
         type2 = None
-        type_offset = start_idx + 16 + len(dex.GEN1_POKEMON)
+        type_offset = start_idx + last_flag_idx + len(dex.GEN1_POKEMON)
         type_indices = obs[type_offset:type_offset + len(dex.TYPES)]
         type_max_indices = np.where(type_indices > 0.5)[0]
         if len(type_max_indices) >= 1:
@@ -206,6 +215,8 @@ class PokemonState:
             confused=confused,
             sleep_turns=sleep_turns,
             substitute=substitute,
+            reflect=reflect,
+            light_screen=light_screen,
             atk_boost=atk_boost,
             def_boost=def_boost,
             special_boost=special_boost,
@@ -311,11 +322,19 @@ class BattleState:
         )
 
 
-if __name__ == "__main__":
-    # TODO: Create a default BattleState with example teams / mons
-    state = BattleState(    
+def create_default_battle_state() -> BattleState:
+    """
+    Create a default BattleState with empty teams and no active Pokemon.
+    
+    Returns:
+        BattleState with empty teams and no active Pokemon.
+    """
+    return BattleState(
         player_active_mon=0,
         opponent_active_mon=0,
         player_team=TeamState(pk_list=[PokemonState() for _ in range(6)]),
         opponent_team=TeamState(pk_list=[PokemonState() for _ in range(6)])
     )
+
+if __name__ == "__main__":
+    state = create_default_battle_state()

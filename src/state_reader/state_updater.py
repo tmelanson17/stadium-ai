@@ -63,11 +63,9 @@ def enact_changes(battle_state: BattleState, changes: Optional[Tuple], opponent:
     elif property_name == "two_turn_move":
         target_pokemon.two_turn_move = value
     elif property_name == "reflect":
-        # TODO: Add reflect field to PokemonState if needed
-        print(f"Warning: Reflect not implemented yet")
+        target_pokemon.reflect = value
     elif property_name == "light_screen":
-        # TODO: Add light_screen field to PokemonState if needed
-        print(f"Warning: Light Screen not implemented yet")
+        target_pokemon.light_screen = value
     elif property_name == "switch":
         # Handle Pokemon switching
         if target == "actor":
@@ -154,4 +152,7 @@ def reset_volatile_conditions(pokemon: PokemonState) -> None:
     pokemon.def_boost = 0
     pokemon.special_boost = 0
     pokemon.speed_boost = 0
+    # Note: In Gen 1, Reflect / Light Screen don't persist on switching
+    pokemon.reflect = False
+    pokemon.light_screen = False
     # Note: Status conditions like burn, poison, etc. persist when switching

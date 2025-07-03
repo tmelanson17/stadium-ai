@@ -6,55 +6,7 @@ from src.state.pokestate import BattleState, TeamState, PokemonState, MoveState
 from src.state_reader.phrases import Messages, parse_update_message
 from src.state_reader.state_updater import enact_changes
 
-
-def create_example_battle_state() -> BattleState:
-    """Create an example battle state for testing."""
-    
-    # Create example moves
-    move1 = MoveState(known=True, name="Tackle", pp=20, pp_max=20, disabled=False)
-    move2 = MoveState(known=True, name="Thunderbolt", pp=15, pp_max=15, disabled=False)
-    
-    # Create example Pokemon
-    player_pokemon = PokemonState(
-        active=True,
-        known=True,
-        name="Pikachu",
-        species="Pikachu",
-        type1="Electric",
-        hp=85.0,
-        move1=move1,
-        move2=move2
-    )
-    
-    opponent_pokemon = PokemonState(
-        active=True,
-        known=True,
-        name="Charmander",
-        species="Charmander",
-        type1="Fire",
-        hp=90.0,
-        move1=move1
-    )
-
-    opponent_bench_pokemon = PokemonState(
-        active=False,
-        known=False,
-        name="SquadGoals",
-        species="Squirtle",
-        type1="Water",
-        hp=100.0,
-    )
-    
-    # Create teams
-    player_team = TeamState(pk_list=[player_pokemon] + [PokemonState() for _ in range(5)])
-    opponent_team = TeamState(pk_list=[opponent_pokemon, opponent_bench_pokemon] + [PokemonState() for _ in range(5)])
-    
-    return BattleState(
-        player_active_mon=0,
-        opponent_active_mon=0,
-        player_team=player_team,
-        opponent_team=opponent_team
-    )
+from test.state_reader.test_utils import create_example_battle_state
 
 
 def demonstrate_message_parsing():

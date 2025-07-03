@@ -86,6 +86,7 @@ This will install:
 ## Known Bugs
 
 - **Partial Trapping Moves**: Partial trapping moves (like Bind, Fire Spin, etc.) are automatically assumed to be successful by the state_reader, which is not always the case. In actual gameplay, these moves can miss or fail to trap the opponent, but the current implementation assumes they always succeed when detected.
+- **Adjust ContinuousTask speed**: Right now, it operates a little slowly.
 
 ## Project Structure
 

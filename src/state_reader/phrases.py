@@ -144,7 +144,7 @@ def parse_update_message(message: str, battle_state: BattleState, opponent: bool
         if move and move.name:
             move_name = move.name.upper()
             if self_pokemon.name:
-                key_str = MOVE_TEMPLATE.format(self_pokemon.name.upper(), move_name)
+                key_str = MOVE_TEMPLATE.format(self_pokemon.name, move_name.upper())
                 if move_name in TRAPPING_MOVES:
                     # TODO: how to reset trapping?
                     message_map[key_str]  = (receiver, "trapped", True)

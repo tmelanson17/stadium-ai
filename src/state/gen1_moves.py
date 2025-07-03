@@ -24,6 +24,7 @@ GEN1_MOVES = [
     Move("Karate Chop", "Normal", 50, 100, 40, "A chopping attack with a high critical-hit ratio."),
     Move("Double Slap", "Normal", 15, 85, 16, "Hits 2-5 times in one turn."),
     Move("Comet Punch", "Normal", 18, 85, 24, "Hits 2-5 times in one turn."),
+    Move("Vine Whip", "Grass", 18, 100, 35, "A Grass-type attack. The Pokémon uses its cruel whips to strike the opponent."),
     Move("Mega Punch", "Normal", 80, 85, 32, "A powerful punch."),
     Move("Pay Day", "Normal", 40, 100, 32, "Scatters coins that are picked up after battle."),
     Move("Scratch", "Normal", 40, 100, 56, "Scratches with sharp claws."),

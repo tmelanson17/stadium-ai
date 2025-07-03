@@ -8,12 +8,18 @@ from src.state_reader.state_reader import (
     StadiumMode,
     Rectangle,
     ImageUpdate,
-    BattleState,
     UpdateQueue
 )
+from src.state.pokestate import (
+    BattleState
+)
+from test.state_reader.test_utils import create_example_battle_state
 
 async def main():
-    queue = UpdateQueue()
+    battle_state = create_example_battle_state(active_p1_name="BULBY")
+    battle_state.player_team.pk_list[battle_state.player_active_mon].confused = False
+
+    queue = UpdateQueue(battle_state)
     STATUS_ROI = Rectangle(76, 230, 406, 296)  # Status condition area
     i=0
     for img_path in os.listdir(os.path.join("test", "data")):
@@ -35,10 +41,9 @@ async def main():
     print("All updates have been put into the queue.")
     state = await queue.get_state()
     assert isinstance(state, BattleState), "Expected BattleState instance"
-    # assert state.p1_hp is not None, "P1 HP not updated."
-    assert state.p1_condition is not None, "P1 Condition not updated."
-    # assert state.p2_hp is not None, "P2 HP not updated."
-    assert state.p2_condition is not None, "P1 Condition not updated."
+    # Check that active pokemon is confused
+    p1_mon = state.player_team.pk_list[state.player_active_mon]
+    assert p1_mon.confused, "Player 1's active Pokemon should be confused"
 
     await queue.close()
     assert queue.queue.empty(), "Queue should be closed and empty"
