@@ -76,7 +76,8 @@ class PokemonState:
     species: Optional[str] = None # Species name
     type1: Optional[str] = None # Species type 1,2
     type2: Optional[str] = None
-    hp: float = 0.0 # Current HP of the Pokemon (%)
+    # TODO: Convert to % when encoding for AI
+    hp: float = 0.0 # Current HP of the Pokemon 
     status: Status = Status.NONE # Status condition of the Pokemon
     trapped: bool = False # Volatile conditions (listed one at a time)
     two_turn_move: bool = False # Whether the Pokemon is currently using a two-turn move
@@ -274,6 +275,11 @@ class BattleState:
     player_team: TeamState
     opponent_team: TeamState
 
+    def get_player_active_mon(self) -> PokemonState:
+        return self.player_team.pk_list[self.player_active_mon]
+
+    def get_opponent_active_mon(self) -> PokemonState:
+        return self.opponent_team.pk_list[self.opponent_active_mon]
 
     def insert_numpy(self, result: np.ndarray, start_idx: int = 0):
         result[start_idx+1] = self.player_active_mon

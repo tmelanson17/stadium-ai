@@ -32,7 +32,7 @@ def test_condition_reader():
     i=0
     for img_name in os.listdir(os.path.join('test', 'data')):
         i+=1 
-        if i > 2:
+        if i > 1:
             break
         if not img_name.endswith('.png'):
             continue
@@ -44,7 +44,10 @@ def test_condition_reader():
         # Example ROI coordinates (top-left and bottom-right corners)
         status_roi = ((76, 230), (406, 296))    # Status condition area
         status_output = test_image("status_condition", status_roi, image, CONDITION_TESSERACT_CONFIG)
-        hp_box_roi = ((30, 20), (138, 78))
+        # hp_box_roi = ((30, 20), (138, 78))
+        hp_box_roi = ((340, 20), (450, 78))
+        ((x1, y1), (x2, y2)) = hp_box_roi
+        cv2.imwrite("hp_box.png", image[y1:y2, x1:x2])
         hp_roi = get_hp_section(hp_box_roi)
         _ = test_image("hp", hp_roi, image, HP_TESSERACT_CONFIG)
         print(f"HP detected: {get_hp(image, hp_box_roi)}")

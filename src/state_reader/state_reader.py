@@ -12,6 +12,7 @@ from src.state.pokestate import BattleState, PokemonState, create_default_battle
 from src.state_reader.condition_reader import read_text_from_roi
 from src.state_reader.phrases import parse_update_message, Messages
 from src.state_reader.state_updater import enact_changes
+from src.state_reader.hp_reader import get_hp
 
 class PlayerID(Enum):
     P1 = 0
@@ -22,6 +23,8 @@ class PlayerID(Enum):
     def __str__(self):
         return f"PlayerID.{self.name}"
 
+# TODO: Make these more relevant to what's being read than what's going on 
+# in the game
 class StadiumMode(Enum):
     CHOOSE_MOVE=0
     EXECUTE=1
@@ -208,10 +211,12 @@ class PlayerHPReader:
         if update.player_id == PlayerID.INVALID:
             print("Invalid player ID, skipping HP update.")
             return None
-        player_id = update.player_id.name.lower()
+        hp = get_hp(update.image, update.roi.to_coord())
         await battle_state.lock_state()
-        battle_state.get_state().player_team.pk_list[battle_state.get_state().player_active_mon].hp = 100  # Stub value, replace with actual logic
-        print(f"Updated {player_id} HP to 100")  # Stub value, replace with actual logic
+        # TODO: Have some filtering on the read HP
+        state = battle_state.get_state()
+        opponent = update.player_id != PlayerID.P1
+        enact_changes(state, ("actor","hp",hp), opponent)
         battle_state.unlock_state()
 
     
