@@ -21,6 +21,7 @@ class Messages(Enum):
     FAILED = "But, it failed!"
     FLINCH = "Flinch???"  # TODO: What is the flinch message?
     REGAINED_HEALTH = "It regained health!"
+    FAINTED = "OK! Come back!"
     
     # Actor effect messages
     FLEW_UP_HIGH = "It flew up high!"

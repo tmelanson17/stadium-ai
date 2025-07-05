@@ -9,59 +9,10 @@ import numpy as np
 import time
 
 from src.state.pokestate import BattleState, PokemonState, create_default_battle_state
+from src.state.pokestate_defs import PlayerID, MessageType, ImageUpdate
 from src.state_reader.condition_reader import read_text_from_roi
 from src.state_reader.phrases import parse_update_message, Messages
 from src.state_reader.state_updater import enact_changes
-
-class PlayerID(Enum):
-    P1 = 0
-    P2 = 1
-    CPU = 2
-    INVALID = 3
-
-    def __str__(self):
-        return f"PlayerID.{self.name}"
-
-class StadiumMode(Enum):
-    CHOOSE_MOVE=0
-    EXECUTE=1
-    PREVIEW=2
-    EXTERNAL=3
-    INVALID=4
-
-    def __str__(self):
-        return f"StadiumMode.{self.name}"
-
-@dataclass 
-class Rectangle:
-    x1: int
-    y1: int
-    x2: int
-    y2: int
-
-    def __str__(self):
-        return f"Rectangle({self.x1}, {self.y1}, {self.x2}, {self.y2})"
-
-    def to_coord(self) -> Tuple[Tuple[int, int], Tuple[int, int]]:
-        '''
-        Converts the rectangle to a tuple of ((x1, y1), (x2, y2))
-        '''
-        return ((self.x1, self.y1), (self.x2, self.y2))
-
-'''
-    POD for receiving data for analysis and state update
-    Contents:
-    - Image : Numpy array for the input frmae
-    - ROI : cv2.Rectangle of the section to analyze
-    - StadiumMode : Enum Which mode the game is in for that frame
-    - player_id : ID of the player that is currently being analyzed. Imporatant for which side to update.
-'''
-@dataclass
-class ImageUpdate:
-    image: np.ndarray
-    roi: Rectangle
-    stadium_mode: StadiumMode
-    player_id: PlayerID
 
     
 ''' 
@@ -174,8 +125,8 @@ class BattleConditionReader:
         '''
         Reads the battle condition from the image within the specified ROI.
         '''
-        if update.stadium_mode != StadiumMode.EXECUTE:
-            print(f"Skipping condition update for {update.stadium_mode}")
+        if update.message_type != MessageType.CONDITION:
+            print(f"Skipping condition update for {update.message_type}")
             return
         if update.player_id == PlayerID.INVALID:
             print("Invalid player ID, skipping condition update.")
@@ -202,8 +153,8 @@ class PlayerHPReader:
         Reads the player HP from the image within the specified ROI.
         Returns an integer representation of the HP or None if not applicable.
         '''
-        if update.stadium_mode != StadiumMode.CHOOSE_MOVE:
-            print(f"Skipping HP update for {update.stadium_mode}")
+        if update.message_type != MessageType.HP:
+            print(f"Skipping HP update for {update.message_type}")
             return None
         if update.player_id == PlayerID.INVALID:
             print("Invalid player ID, skipping HP update.")
@@ -229,9 +180,9 @@ class StateReader:
     async def handle_update(self, update: ImageUpdate):
         # This method should handle the update and modify the internal state accordingly
         time.sleep(1)
-        if update.stadium_mode == StadiumMode.EXECUTE:
+        if update.message_type == MessageType.CONDITION:
             await self.condition_reader.handle_condition_update(self.state, update)
-        elif update.stadium_mode == StadiumMode.CHOOSE_MOVE:
+        elif update.message_type == MessageType.HP:
             await self.hp_reader.update_hp(self.state, update)
         
 
