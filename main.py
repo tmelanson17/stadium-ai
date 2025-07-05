@@ -3,8 +3,10 @@ import cv2
 
 from argparse import ArgumentParser
 
+from src.display.draw import draw_updates, draw_mode
 from src.state.pokestate import print_battle_state
-from src.box_detection.box_detection import BoxDetection, draw_updates
+from src.screen_parsing.box_detection import BoxDetection
+from src.screen_parsing.stadium_mode import StadiumModeParser
 from src.state.pokestate_defs import ImageUpdate
 from src.state_reader.state_reader import UpdateQueue
 from src.params.yaml_parser import load_battle_state_from_yaml
@@ -36,7 +38,9 @@ async def main(args):
 
     box_detection = BoxDetection()
     battle_state = load_battle_state_from_yaml('config/battle5.yaml')
-    update_queue = UpdateQueue(battle_state)
+    stadium_mode_parser = StadiumModeParser()
+
+    # update_queue = UpdateQueue(battle_state)
 
     # Read a frame from the video source
     while True:
@@ -46,24 +50,26 @@ async def main(args):
             break
 
         updates = box_detection.update(frame)
-        for update in updates:
-            if isinstance(update, ImageUpdate):
-                # Add the update to the queue for processing
-                await update_queue.put(update)
-            else:
-                print(f"Unexpected update type: {type(update)}")
+        _ = stadium_mode_parser.parse(updates)
+        # for update in updates:
+        #     if isinstance(update, ImageUpdate):
+        #         # Add the update to the queue for processing
+        #         await update_queue.put(update)
+        #     else:
+        #         print(f"Unexpected update type: {type(update)}")
 
-        if await update_queue.done():
-            # Process the updates in the queue
-            battle_state = await update_queue.get_state()
-            print("Battle State Updated:")
-            print_battle_state(battle_state)
-            update_queue.reset()
+        # if await update_queue.done():
+        #     # Process the updates in the queue
+        #     battle_state = await update_queue.get_state()
+        #     print("Battle State Updated:")
+        #     print_battle_state(battle_state)
+        #     update_queue.reset()
 
 
         # Display the image in a window
         output_frame = frame.copy()
         draw_updates(output_frame, updates)
+        output_frame = draw_mode(output_frame, stadium_mode_parser.prev_mode)
         cv2.imshow('Image', output_frame)
 
         # Wait for 1 ms and check if 'q' is pressed to exit

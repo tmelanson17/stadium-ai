@@ -31,7 +31,7 @@ class BoxAverageFilter:
     '''
     def is_outlier(self, value: Rectangle, threshold: float = 0.5) -> bool:
         if not self.values or len(self.values) < self.window_size:
-            return False
+            return True
 
         avg = self.get_average()
         return (abs(value.x1 - avg.x1) > threshold * (avg.x2 - avg.x1) or

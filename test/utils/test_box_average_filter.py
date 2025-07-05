@@ -96,14 +96,14 @@ class TestBoxAverageFilter(unittest.TestCase):
         close_rect = Rectangle(10, 10, 21, 20)  # Only x2 differs by 1, well within threshold
         self.assertFalse(filter.is_outlier(close_rect))
     
-    def test_empty_filter_no_outliers(self):
+    def test_empty_filter_outliers(self):
         """Test that empty filter doesn't consider anything an outlier"""
         filter = BoxAverageFilter(window_size=5)
         
         test_rect = Rectangle(100, 200, 300, 400)
-        self.assertFalse(filter.is_outlier(test_rect))
+        self.assertTrue(filter.is_outlier(test_rect))
     
-    def test_insufficient_data_no_outliers(self):
+    def test_insufficient_data_outliers(self):
         """Test that filter with insufficient data doesn't consider anything an outlier"""
         filter = BoxAverageFilter(window_size=5)
         
@@ -112,7 +112,7 @@ class TestBoxAverageFilter(unittest.TestCase):
             filter.add(Rectangle(i, i, i+10, i+10))
         
         test_rect = Rectangle(1000, 1000, 2000, 2000)
-        self.assertFalse(filter.is_outlier(test_rect))
+        self.assertTrue(filter.is_outlier(test_rect))
 
 
 if __name__ == '__main__':

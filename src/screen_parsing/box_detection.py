@@ -86,12 +86,13 @@ Uses an AverageFilter to smooth out the location of the boxes over time and dete
 class BoxDetection:
 
     def __init__(self):
-        self.p1_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P1 HP boxes
-        self.p2_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 HP boxes
-        self.status_boxes = BoxAverageFilter(window_size=20)  # Filter for status boxes
-        self.P1_OUTLIER_THRESHOLD = 0.1  # Threshold for P1 HP box detection
+        self.p1_hp_boxes = BoxAverageFilter(window_size=15)  # Filter for P1 HP boxes
+        self.p2_top_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 top HP boxes
+        self.p2_bottom_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 bottom HP boxes
+        self.status_boxes = BoxAverageFilter(window_size=5)  # Filter for status boxes
+        self.P1_OUTLIER_THRESHOLD = 0.05  # Threshold for P1 HP box detection
         self.P2_OUTLIER_THRESHOLD = 0.1  # Threshold for P2 HP box detection
-        self.STATUS_OUTLIER_THRESHOLD = 0.1  # Threshold for status box detection
+        self.STATUS_OUTLIER_THRESHOLD = 0.05  # Threshold for status box detection
 
     def _get_update_box(self, input_img: np.ndarray, box: Optional[Rectangle], p1: bool, is_hp_box: bool) -> Optional[ImageUpdate]:
         if box is not None:
@@ -103,17 +104,25 @@ class BoxDetection:
                         return ImageUpdate(input_img, self.p1_hp_boxes.get_average(), MessageType.HP, PlayerID.P1)
                     self.p1_hp_boxes.add(box)  # Reset if outlier detected
                 else:
-                    if not self.p2_hp_boxes.is_outlier(box, threshold=self.P2_OUTLIER_THRESHOLD):
-                        self.p2_hp_boxes.add(box)
-                        return ImageUpdate(input_img, self.p2_hp_boxes.get_average(), MessageType.HP, PlayerID.P2)
-                    self.p2_hp_boxes.add(box)  # Reset if outlier detected
+                    # For P2, we need to check if the box is in the top or bottom half
+                    if box.y1 < input_img.shape[0] / 2:  # Top half of the screen
+                        if not self.p2_top_hp_boxes.is_outlier(box, threshold=self.P2_OUTLIER_THRESHOLD):
+                            self.p2_top_hp_boxes.add(box)
+                            return ImageUpdate(input_img, self.p2_top_hp_boxes.get_average(), MessageType.HP, PlayerID.P2)
+                        self.p2_top_hp_boxes.add(box)
+                    else:  # Bottom half of the screen
+                        # Add to the bottom HP box filter
+                        if not self.p2_bottom_hp_boxes.is_outlier(box, threshold=self.P2_OUTLIER_THRESHOLD):
+                            self.p2_bottom_hp_boxes.add(box)
+                            return ImageUpdate(input_img, self.p2_bottom_hp_boxes.get_average(), MessageType.HP, PlayerID.P2)
+                        self.p2_bottom_hp_boxes.add(box)
             else:
                 # If the box is a status box, add it to the status box filter
                 if not self.status_boxes.is_outlier(box, threshold=self.STATUS_OUTLIER_THRESHOLD):
                     self.status_boxes.add(box)
                     player_id = PlayerID.P1 if p1 else PlayerID.P2
                     return ImageUpdate(input_img, self.status_boxes.get_average(), MessageType.CONDITION, player_id)
-                # self.status_boxes.add(box)  # Reset if outlier detected
+                self.status_boxes.add(box)  # Reset if outlier detected
         return None
 
     def _detect_contours(self, input_img):
@@ -122,7 +131,8 @@ class BoxDetection:
         # equalized_img = cv2.equalizeHist(normalized_img)
         blurred = cv2.GaussianBlur(normalized_img, (5,5), 1.0)  # Apply median blur to the image
         # Perform Canny edge detection on the input image
-        edges = cv2.Canny(blurred, threshold1=120, threshold2=300)
+        # edges = cv2.Canny(blurred, threshold1=120, threshold2=300)
+        edges = cv2.Canny(blurred, threshold1=100, threshold2=300)
 
         morphed_img = _apply_morphology(edges, kernel_size=(3, 3))  # Apply morphology to enhance edges
 
@@ -179,29 +189,8 @@ class BoxDetection:
                 box = Rectangle(x, y, x+w, y+h)
 
 
-            update = self._get_update_box(input_img, box, p1, is_hp_box)
+            update = self._get_update_box(input_img, box, bool(p1), is_hp_box)
             if update is not None:
                 updates.append(update)
 
         return updates
-
-
-def draw_updates(input_img: np.ndarray, updates: Sequence[ImageUpdate]) -> np.ndarray:
-    """
-    Draws the updates on the input image.
-    
-    Parameters:
-    - input_img: The input image to draw on.
-    - updates: A sequence of ImageUpdate objects containing the rectangles to draw.
-    
-    Returns:
-    - The input image with the rectangles drawn on it.
-    """
-    for update in updates:
-        p1, p2 = update.roi.to_coord()
-        cv2.rectangle(input_img, p1, p2, (0, 255, 0), 2)
-        cv2.putText(input_img, update.message_type.name, (update.roi.x1, update.roi.y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-        # Add player ID text
-        player_text = f"Player: {update.player_id.name}"
-        cv2.putText(input_img, player_text, (update.roi.x1, update.roi.y1 - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-    return input_img
