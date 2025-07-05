@@ -5,10 +5,12 @@ import os
 
 from src.state_reader.state_reader import (
     PlayerID,
-    StadiumMode,
-    Rectangle,
-    ImageUpdate,
     UpdateQueue
+)
+from src.state.pokestate_defs import (
+    MessageType,
+    ImageUpdate,
+    Rectangle
 )
 from src.state.pokestate import (
     BattleState
@@ -18,21 +20,22 @@ from test.state_reader.test_utils import create_example_battle_state
 async def main():
     battle_state = create_example_battle_state(active_p1_name="BULBY")
     battle_state.player_team.pk_list[battle_state.player_active_mon].confused = False
+    top_dir = os.getcwd()
 
     queue = UpdateQueue(battle_state)
     STATUS_ROI = Rectangle(76, 230, 406, 296)  # Status condition area
     i=0
-    for img_path in os.listdir(os.path.join("test", "data")):
+    for img_path in os.listdir(os.path.join(top_dir, "test", "data")):
         if not img_path.endswith(".png"):
             continue
-        full_path = os.path.join("test", "data", img_path)
+        full_path = os.path.join(top_dir, "test", "data", img_path)
         print(f"Testing with image: {full_path}")
         image = cv2.imread(full_path)
         id = PlayerID.P1 if i % 2 == 0 else PlayerID.P2
         input_update_p1_hp = ImageUpdate(
             image=image,
             roi=STATUS_ROI,
-            stadium_mode=StadiumMode.EXECUTE,
+            message_type=MessageType.CONDITION,
             player_id=id
         )
         i += 1

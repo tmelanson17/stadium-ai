@@ -44,7 +44,7 @@ GEN1_MOVES = [
     Move("Mega Kick", "Normal", 120, 75, 8, "A powerful kick."),
     Move("Jump Kick", "Fighting", 70, 95, 40, "A jumping kick. If it misses, the user is hurt."),
     Move("Rolling Kick", "Fighting", 60, 85, 24, "A fast kick delivered from a rapid spin."),
-    Move("Sand Attack", "Normal", None, 100, 24, "Reduces the foe's accuracy."),
+    Move("Sand-Attack", "Normal", None, 100, 24, "Reduces the foe's accuracy."),
     Move("Headbutt", "Normal", 70, 100, 24, "A ramming attack. May cause flinching."),
     Move("Horn Attack", "Normal", 65, 100, 40, "Stabs with a horn."),
     Move("Fury Attack", "Normal", 15, 85, 32, "Hits 2-5 times in one turn."),
@@ -132,7 +132,7 @@ GEN1_MOVES = [
     Move("Bide", "Normal", None, 100, 16, "Endures attacks for 2 turns, then strikes back double."),
     Move("Metronome", "Normal", None, 100, 16, "Randomly uses any move."),
     Move("Mirror Move", "Flying", None, 100, 32, "Counters with the same move."),
-    Move("Self-Destruct", "Normal", 200, 100, 8, "Inflicts severe damage but makes the user faint."),
+    Move("Selfdestruct", "Normal", 200, 100, 8, "Inflicts severe damage but makes the user faint."),
     Move("Egg Bomb", "Normal", 100, 75, 16, "An egg is hurled at the foe."),
     Move("Lick", "Ghost", 20, 100, 48, "Licks with a long tongue. May cause paralysis."),
     Move("Smog", "Poison", 20, 70, 32, "An attack that may poison the foe."),
@@ -177,6 +177,7 @@ GEN1_MOVES = [
     Move("Super Fang", "Normal", None, 90, 16, "Attacks with sharp fangs and cuts HP in half."),
     Move("Slash", "Normal", 70, 100, 32, "Slashes with claws. High critical-hit ratio."),
     Move("Substitute", "Normal", None, 100, 16, "Creates a decoy using 1/4 of max HP."),
+    Move("Twinneedle", "Bug", 25, 100, 24, "Hits twice in one turn with bug-like needles."),
 ]
 
 # Type-specific move lists for easier filtering

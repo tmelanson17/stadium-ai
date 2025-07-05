@@ -336,5 +336,114 @@ def create_default_battle_state() -> BattleState:
         opponent_team=TeamState(pk_list=[PokemonState() for _ in range(6)])
     )
 
+def print_battle_state(battle_state: BattleState, title: str = "Battle State") -> None:
+    """
+    Print the BattleState in a clear, formatted way for debugging and visualization.
+    
+    Args:
+        battle_state: The BattleState to print
+        title: Optional title for the printout
+    """
+    print("=" * 80)
+    print(f"{title:^80}")
+    print("=" * 80)
+    
+    def print_pokemon(pokemon: PokemonState, slot: int, is_active: bool = False) -> None:
+        """Helper function to print a single Pokemon's state"""
+        status_indicator = "🔴" if is_active else "⚪"
+        species_name = pokemon.species or "Unknown"
+        level_str = f"Lv.{pokemon.level}" if pokemon.level > 0 else "Lv.?"
+
+        # Format HP with one decimal place, ensuring one digit before the decimal
+        hp_str = f"{pokemon.hp:.1f}%" if pokemon.hp > 0 else "0.0%"
+        
+        # Status condition emoji
+        status_emoji = {
+            Status.NONE: "",
+            Status.BURNED: "🔥",
+            Status.FROZEN: "🧊", 
+            Status.PARALYZED: "⚡",
+            Status.POISONED: "☠️",
+            Status.SLEEP: "💤",
+            Status.FAINTED: "💀"
+        }.get(pokemon.status, "")
+        
+        print(f"  {status_indicator} Slot {slot+1}: {species_name} {level_str} - HP: {hp_str} {status_emoji}")
+        
+        if pokemon.known and (pokemon.move1 or pokemon.move2 or pokemon.move3 or pokemon.move4):
+            moves = []
+            for move in [pokemon.move1, pokemon.move2, pokemon.move3, pokemon.move4]:
+                if move and move.known and move.name:
+                    pp_str = f"({move.pp}/{move.pp_max})"
+                    disabled_str = " [DISABLED]" if move.disabled else ""
+                    moves.append(f"{move.name} {pp_str}{disabled_str}")
+            if moves:
+                print(f"    Moves: {' | '.join(moves)}")
+        
+        # Show stat boosts if any
+        boosts = []
+        if pokemon.atk_boost != 0:
+            boosts.append(f"Atk: {pokemon.atk_boost:+d}")
+        if pokemon.def_boost != 0:
+            boosts.append(f"Def: {pokemon.def_boost:+d}")
+        if pokemon.special_boost != 0:
+            boosts.append(f"Spc: {pokemon.special_boost:+d}")
+        if pokemon.speed_boost != 0:
+            boosts.append(f"Spd: {pokemon.speed_boost:+d}")
+        if boosts:
+            print(f"    Stat Boosts: {' | '.join(boosts)}")
+            
+        # Show conditions
+        conditions = []
+        if pokemon.trapped:
+            conditions.append("Trapped")
+        if pokemon.confused:
+            conditions.append("Confused")
+        if pokemon.substitute:
+            conditions.append("Substitute")
+        if pokemon.reflect:
+            conditions.append("Reflect")
+        if pokemon.light_screen:
+            conditions.append("Light Screen")
+        if pokemon.two_turn_move:
+            conditions.append("Two-turn Move")
+        if pokemon.sleep_turns > 0:
+            conditions.append(f"Sleep ({pokemon.sleep_turns} turns)")
+        if conditions:
+            print(f"    Conditions: {' | '.join(conditions)}")
+    
+    # Player team
+    print("\n🔵 PLAYER TEAM:")
+    print("-" * 40)
+    for i, pokemon in enumerate(battle_state.player_team.pk_list):
+        is_active = (i == battle_state.player_active_mon)
+        print_pokemon(pokemon, i, is_active)
+    
+    # Opponent team  
+    print("\n🔴 OPPONENT TEAM:")
+    print("-" * 40)
+    for i, pokemon in enumerate(battle_state.opponent_team.pk_list):
+        is_active = (i == battle_state.opponent_active_mon)
+        print_pokemon(pokemon, i, is_active)
+    
+    print("\n" + "=" * 80)
+
+
 if __name__ == "__main__":
     state = create_default_battle_state()
+    print_battle_state(state, "Default Battle State")
+    
+    # Example with some data
+    state.player_team.pk_list[0].species = "Charizard"
+    state.player_team.pk_list[0].level = 50
+    state.player_team.pk_list[0].hp = 85.5
+    state.player_team.pk_list[0].status = Status.BURNED
+    state.player_team.pk_list[0].known = True
+    state.player_team.pk_list[0].move1 = MoveState(known=True, name="Flamethrower", pp=15, pp_max=15, disabled=False)
+    
+    state.opponent_team.pk_list[0].species = "Blastoise"
+    state.opponent_team.pk_list[0].level = 50
+    state.opponent_team.pk_list[0].hp = 92.3
+    state.opponent_team.pk_list[0].known = True
+    
+    print_battle_state(state, "Example Battle State")

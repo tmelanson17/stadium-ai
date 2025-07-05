@@ -87,6 +87,8 @@ This will install:
 
 - **Partial Trapping Moves**: Partial trapping moves (like Bind, Fire Spin, etc.) are automatically assumed to be successful by the state_reader, which is not always the case. In actual gameplay, these moves can miss or fail to trap the opponent, but the current implementation assumes they always succeed when detected.
 - **Adjust ContinuousTask speed**: Right now, it operates a little slowly.
+- **Incomplete Battle Information**: Current battle state has full information. Need a way to pass incomplete information to RL agent, since opponent's moves/mons are not known at the start of the battle.
+- **Team Preview Mode**: Currently Battle State receives Pokemon directly from team specs. Needs to handle the Team Preview stage where the three pokemon are chosen.
 
 ## Project Structure
 

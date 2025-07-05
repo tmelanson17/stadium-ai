@@ -88,29 +88,32 @@ class BoxDetection:
     def __init__(self):
         self.p1_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P1 HP boxes
         self.p2_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 HP boxes
-        self.status_boxes = BoxAverageFilter(window_size=10)  # Filter for status boxes
+        self.status_boxes = BoxAverageFilter(window_size=20)  # Filter for status boxes
+        self.P1_OUTLIER_THRESHOLD = 0.1  # Threshold for P1 HP box detection
+        self.P2_OUTLIER_THRESHOLD = 0.1  # Threshold for P2 HP box detection
+        self.STATUS_OUTLIER_THRESHOLD = 0.1  # Threshold for status box detection
 
     def _get_update_box(self, input_img: np.ndarray, box: Optional[Rectangle], p1: bool, is_hp_box: bool) -> Optional[ImageUpdate]:
         if box is not None:
             if is_hp_box:
                 # If the box is an HP box, add it to the appropriate player's HP box filter
                 if p1:
-                    if not self.p1_hp_boxes.is_outlier(box, threshold=0.1):
+                    if not self.p1_hp_boxes.is_outlier(box, threshold=self.P1_OUTLIER_THRESHOLD):
                         self.p1_hp_boxes.add(box)
                         return ImageUpdate(input_img, self.p1_hp_boxes.get_average(), MessageType.HP, PlayerID.P1)
                     self.p1_hp_boxes.add(box)  # Reset if outlier detected
                 else:
-                    if not self.p2_hp_boxes.is_outlier(box, threshold=0.1):
+                    if not self.p2_hp_boxes.is_outlier(box, threshold=self.P2_OUTLIER_THRESHOLD):
                         self.p2_hp_boxes.add(box)
                         return ImageUpdate(input_img, self.p2_hp_boxes.get_average(), MessageType.HP, PlayerID.P2)
                     self.p2_hp_boxes.add(box)  # Reset if outlier detected
             else:
                 # If the box is a status box, add it to the status box filter
-                if not self.status_boxes.is_outlier(box, threshold=0.1):
+                if not self.status_boxes.is_outlier(box, threshold=self.STATUS_OUTLIER_THRESHOLD):
                     self.status_boxes.add(box)
                     player_id = PlayerID.P1 if p1 else PlayerID.P2
                     return ImageUpdate(input_img, self.status_boxes.get_average(), MessageType.CONDITION, player_id)
-                self.status_boxes.add(box)  # Reset if outlier detected
+                # self.status_boxes.add(box)  # Reset if outlier detected
         return None
 
     def _detect_contours(self, input_img):

@@ -99,6 +99,8 @@ class BattleStateUpdate:
     Used for the EXECUTE stage
 '''
 class BattleConditionReader:
+    updated: bool = False
+    
     '''
         Update the battle condition based on the condition message.
     '''
@@ -113,6 +115,7 @@ class BattleConditionReader:
             print(f"Applying change: {change} for player {pid}")
             # Apply the changes to the battle state
             enact_changes(state, change, opponent)
+            self.updated = True
         battle_state.unlock_state()
         
 
@@ -148,6 +151,8 @@ class BattleConditionReader:
     Stub for reading the player HP.
 '''
 class PlayerHPReader:
+    updated: bool = False
+    
     async def update_hp(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
         '''
         Reads the player HP from the image within the specified ROI.
@@ -160,9 +165,11 @@ class PlayerHPReader:
             print("Invalid player ID, skipping HP update.")
             return None
         player_id = update.player_id.name.lower()
+        print(f"Updating HP for {player_id}...")
         await battle_state.lock_state()
         battle_state.get_state().player_team.pk_list[battle_state.get_state().player_active_mon].hp = 100  # Stub value, replace with actual logic
         print(f"Updated {player_id} HP to 100")  # Stub value, replace with actual logic
+        self.updated = True
         battle_state.unlock_state()
 
     
@@ -179,7 +186,6 @@ class StateReader:
 
     async def handle_update(self, update: ImageUpdate):
         # This method should handle the update and modify the internal state accordingly
-        time.sleep(1)
         if update.message_type == MessageType.CONDITION:
             await self.condition_reader.handle_condition_update(self.state, update)
         elif update.message_type == MessageType.HP:
@@ -188,6 +194,19 @@ class StateReader:
 
     def get_state(self) -> BattleState:
         return self.state.get_state()
+
+    def updated(self) -> bool:
+        '''
+        Returns True if any updates were made to the state.
+        '''
+        return self.condition_reader.updated and self.hp_reader.updated
+    
+    def reset(self):
+        '''
+        Resets the state reader to its initial state.
+        '''
+        self.condition_reader.updated = False
+        self.hp_reader.updated = False
 
 
 '''
@@ -206,7 +225,20 @@ class UpdateQueue():
     async def get_state(self) -> BattleState:
         await self.processor.join()  # Wait for all items to be processed
         return self.state_reader.get_state()
+
+    async def done(self):
+        '''
+        Determines if the queue is empty and all items have been processed.
+        '''
+        return self.state_reader.updated()
     
+    def reset(self):
+        '''
+        Resets the state reader and clears the queue.
+        '''
+        self.state_reader.reset()
+        self.queue = Queue()
+
     async def close(self):
         '''
         Closes the queue and cancels the processing task.
