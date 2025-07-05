@@ -13,7 +13,7 @@ from src.state.pokestate_defs import PlayerID, MessageType, ImageUpdate
 from src.state_reader.condition_reader import read_text_from_roi
 from src.state_reader.phrases import parse_update_message, Messages
 from src.state_reader.state_updater import enact_changes
-
+from src.state_reader.hp_reader import get_hp
     
 ''' 
     Creates a class that repeatedly executes "loop" as an asynchronous task.
@@ -164,11 +164,13 @@ class PlayerHPReader:
         if update.player_id == PlayerID.INVALID:
             print("Invalid player ID, skipping HP update.")
             return None
-        player_id = update.player_id.name.lower()
-        print(f"Updating HP for {player_id}...")
+        print(f"Updating HP for {update.player_id.value}...")
+        hp = get_hp(update.image, update.roi.to_coord())
         await battle_state.lock_state()
-        battle_state.get_state().player_team.pk_list[battle_state.get_state().player_active_mon].hp = 100  # Stub value, replace with actual logic
-        print(f"Updated {player_id} HP to 100")  # Stub value, replace with actual logic
+        # TODO: Have some filtering on the read HP
+        state = battle_state.get_state()
+        opponent = update.player_id != PlayerID.P1
+        enact_changes(state, ("actor","hp",hp), opponent)
         self.updated = True
         battle_state.unlock_state()
 

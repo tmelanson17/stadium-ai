@@ -42,4 +42,6 @@ def get_hp(image: np.ndarray, roi: BBox) -> int:
     hp_strings = [line.strip() for line in hp_strings if line is not None]
     # Clean any non-numeric characters
     hp_string = ''.join(filter(str.isdigit, ' '.join(hp_strings)))
+    if len(hp_string) == 0:
+        return 0
     return int(hp_string)
