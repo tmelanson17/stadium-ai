@@ -60,6 +60,7 @@ def main(args):
     }
     shm = SharedImageList(camera_config=camera_config, create=True)
     publish_message_to_topic('camera_config', camera_config)
+    idx=0
 
     # Read a frame from the video source
     while True:
@@ -73,7 +74,7 @@ def main(args):
         stadium_mode = stadium_mode_parser.parse(updates)
         if stadium_mode is not None:
             update_processor.update_mode(stadium_mode)
-        processed_updates = update_processor.process_updates(updates)
+        processed_updates = update_processor.process_updates(updates, idx)
         for update in processed_updates:
             if isinstance(update, ImageUpdate):
                 # Add the update to the queue for processing
@@ -91,6 +92,7 @@ def main(args):
 
 
         # Display the image in a window
+        idx += 1
         output_frame = frame.copy()
         draw_updates(output_frame, updates)
         output_frame = draw_mode(output_frame, stadium_mode_parser.prev_mode)
