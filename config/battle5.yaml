@@ -1,6 +1,6 @@
 Team 1:
   - species: "Charizard"
-    nickname: "Charizard"
+    nickname: "CHARIZARD"
     level: 50
     moves:
       - "Fire Blast"
@@ -8,7 +8,7 @@ Team 1:
       - "Fire Spin"
       - "Slash"
   - species: "Blastoise"
-    nickname: "Blastoise"
+    nickname: "BLASTOISE"
     level: 50
     moves:
       - "Hydro Pump"
@@ -16,7 +16,7 @@ Team 1:
       - "Withdraw"
       - "Tail Whip"
   - species: "Charmander"
-    nickname: "Charmander"
+    nickname: "CHARMANDER"
     level: 50
     moves:
       - "Flamethrower"
@@ -24,7 +24,7 @@ Team 1:
       - "Seismic Toss"
       - "Dig"
   - species: "Pikachu"
-    nickname: "Pikachu"
+    nickname: "PIKACHU"
     level: 50
     moves:
       - "Thunderbolt"
@@ -32,7 +32,7 @@ Team 1:
       - "Reflect"
       - "Thunder Wave"
   - species: "Raichu"
-    nickname: "Raichu"
+    nickname: "RAICHU"
     level: 50
     moves:
       - "Thunder"
@@ -40,7 +40,7 @@ Team 1:
       - "Quick Attack"
       - "Mega Kick"
   - species: "Beedrill"
-    nickname: "Beedrill"
+    nickname: "BEEDRILL"
     level: 50
     moves:
       - "Twinneedle"
@@ -50,7 +50,7 @@ Team 1:
 
 Team 2:
   - species: "Pidgeot"
-    nickname: "Pidgeot"
+    nickname: "PIDGEOT"
     level: 50
     moves:
       - "Sand-Attack"
@@ -58,7 +58,7 @@ Team 2:
       - "Fly"
       - "Quick Attack"
   - species: "Nidoking"
-    nickname: "Nidoking"
+    nickname: "NIDOKING"
     level: 50
     moves:
       - "Substitute"
@@ -66,7 +66,7 @@ Team 2:
       - "Horn Drill"
       - "Rage"
   - species: "Fearow"
-    nickname: "Fearow"
+    nickname: "FEAROW"
     level: 50
     moves:
       - "Swift"
@@ -74,7 +74,7 @@ Team 2:
       - "Drill Peck"
       - "Mirror Move"
   - species: "Poliwrath"
-    nickname: "Poliwrath"
+    nickname: "POLIWRATH"
     level: 50
     moves:
       - "Hydro Pump"
@@ -82,7 +82,7 @@ Team 2:
       - "Submission"
       - "Hypnosis"
   - species: "Machamp"
-    nickname: "Machamp"
+    nickname: "MACHAMP"
     level: 50
     moves:
       - "Focus Energy"
@@ -90,7 +90,7 @@ Team 2:
       - "Strength"
       - "Counter"
   - species: "Graveler"
-    nickname: "Graveler"
+    nickname: "GRAVELER"
     level: 50
     moves:
       - "Selfdestruct"

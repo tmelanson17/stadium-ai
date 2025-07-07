@@ -1,6 +1,11 @@
 import cv2
 import numpy as np
 import pytesseract
+import sys
+
+# Ensure pytesseract is configured correctly for Windows
+if sys.platform.startswith('win'):
+    pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 from typing import Tuple, Optional, List
 

@@ -22,7 +22,6 @@ Example Usage:
 
 import cv2
 import numpy as np
-import pytesseract
 from typing import List, Tuple, Optional, Union
 
 from src.state_reader.phrases import parse_update_message

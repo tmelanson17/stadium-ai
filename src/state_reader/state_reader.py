@@ -2,11 +2,9 @@ from asyncio import Queue
 from copy import copy
 from dataclasses import dataclass
 from enum import Enum
-from typing import TypeVar, Generic, Optional, Callable, Awaitable, Tuple
+from typing import Optional, Dict
 
-import asyncio
 import numpy as np
-import time
 
 from src.state.pokestate import BattleState, PokemonState, create_default_battle_state
 from src.state.pokestate_defs import PlayerID, MessageType, ImageUpdate
@@ -14,56 +12,11 @@ from src.state_reader.condition_reader import read_text_from_roi
 from src.state_reader.phrases import parse_update_message, Messages
 from src.state_reader.state_updater import enact_changes
 from src.state_reader.hp_reader import get_hp
+from src.utils.shared_image_list import SharedImageList
+from src.utils.serialization import deserialize_image_update
+from src.rabbitmq.receive import listen
+from src.rabbitmq.topics import CONFIG, IMAGE_UPDATE
     
-''' 
-    Creates a class that repeatedly executes "loop" as an asynchronous task.
-    This will execute until the task is cancelled.
-'''  
-Input = TypeVar('Input')
-class ContinuousTask(Generic[Input]):
-    def __init__(self, queue: Queue[Input], task_fn: Callable[[Input], Awaitable[None]]):
-        self._task_fn = task_fn 
-        self._queue = queue
-        self._loop = asyncio.create_task(self.run())
-
-    async def run(self):
-        try:
-            while not self._queue.empty():
-                item = await self._queue.get()
-                await self._task_fn(item)
-                self._queue.task_done()
-                await asyncio.sleep(0.1)  # Adjust the sleep time as needed
-        except asyncio.CancelledError:
-            print("ContinuousTask cancelled.")
-            while not self._queue.empty():
-                item = await self._queue.get()
-                self._queue.task_done()
-        finally:
-            print("ContinuousTask finished.")
-
-    async def put(self, item: Input):
-        '''
-        Puts an item into the queue for processing.
-        '''
-        await self._queue.put(item)
-    
-    async def close(self):
-        '''
-        Cancels the task and waits for it to finish.
-        '''
-        if self._loop:
-            self._loop.cancel()
-            try:
-                await self._loop
-            except asyncio.CancelledError:
-                pass
-    
-    async def join(self):
-        '''
-        Waits for all items in the queue to be processed.
-        '''
-        await self._queue.join()
-        print("All items processed.")
 '''
     Wrapper for BattleState to handle updates and locking.
 '''
@@ -73,13 +26,6 @@ class BattleStateUpdate:
             self._state = create_default_battle_state()
         else:
             self._state = battle_state
-        self._lock = asyncio.Lock()
-
-    async def lock_state(self):
-        await self._lock.acquire()
-
-    def unlock_state(self):
-        self._lock.release()
 
     def get_active_pokemon(self, player_id: PlayerID) -> PokemonState:
         if player_id == PlayerID.P1:
@@ -104,9 +50,8 @@ class BattleConditionReader:
     '''
         Update the battle condition based on the condition message.
     '''
-    async def update_condition(self, battle_state: BattleStateUpdate, message: str, pid: PlayerID) -> None:
+    def update_condition(self, battle_state: BattleStateUpdate, message: str, pid: PlayerID) -> None:
         opponent = pid != PlayerID.P1
-        await battle_state.lock_state()
         state = battle_state.get_state()
         change = parse_update_message(message, state, opponent)
         if change is None:
@@ -116,7 +61,6 @@ class BattleConditionReader:
             # Apply the changes to the battle state
             enact_changes(state, change, opponent)
             self.updated = True
-        battle_state.unlock_state()
         
 
     
@@ -124,7 +68,7 @@ class BattleConditionReader:
         Reads the battle condition from the image within the specified ROI.
         Returns a string representation of the condition or None if not applicable.
     '''
-    async def handle_condition_update(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
+    def handle_condition_update(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
         '''
         Reads the battle condition from the image within the specified ROI.
         '''
@@ -143,7 +87,7 @@ class BattleConditionReader:
                 print("Skipping None text update.")
                 continue
             print(f"Condition detected for {update.player_id.value}: {text}")
-            await self.update_condition(battle_state, text, update.player_id)
+            self.update_condition(battle_state, text, update.player_id)
         
 
 
@@ -153,7 +97,7 @@ class BattleConditionReader:
 class PlayerHPReader:
     updated: bool = False
     
-    async def update_hp(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
+    def update_hp(self, battle_state: BattleStateUpdate, update: ImageUpdate) -> None:
         '''
         Reads the player HP from the image within the specified ROI.
         Returns an integer representation of the HP or None if not applicable.
@@ -166,13 +110,11 @@ class PlayerHPReader:
             return None
         print(f"Updating HP for {update.player_id.value}...")
         hp = get_hp(update.image, update.roi.to_coord())
-        await battle_state.lock_state()
         # TODO: Have some filtering on the read HP
         state = battle_state.get_state()
         opponent = update.player_id != PlayerID.P1
         enact_changes(state, ("actor","hp",hp), opponent)
         self.updated = True
-        battle_state.unlock_state()
 
     
 '''
@@ -185,14 +127,31 @@ class StateReader:
         self.state = BattleStateUpdate(initial_state)
         self.condition_reader = BattleConditionReader()
         self.hp_reader = PlayerHPReader()
+        self.shm = None
 
-    async def handle_update(self, update: ImageUpdate):
+    def handle_update(self, update: ImageUpdate):
         # This method should handle the update and modify the internal state accordingly
         if update.message_type == MessageType.CONDITION:
-            await self.condition_reader.handle_condition_update(self.state, update)
+            self.condition_reader.handle_condition_update(self.state, update)
         elif update.message_type == MessageType.HP:
-            await self.hp_reader.update_hp(self.state, update)
+            self.hp_reader.update_hp(self.state, update)
         
+    def handle_update_wrapper(self, update_dict: Dict[str, str]):
+        '''
+        Wrapper for handling updates from a dictionary.
+        This is useful for deserializing updates from JSON or other formats.
+        '''
+        if self.shm is None:
+            raise ValueError("SharedImageList not initialized. Call handle_camera_config first.")
+        update = deserialize_image_update(update_dict, self.shm)
+        if update is None:
+            print("Failed to deserialize ImageUpdate, skipping.")
+            return
+        self.handle_update(update)
+
+    def handle_camera_config(self, config: Dict[str, str]):
+        self.shm = SharedImageList(config, create=False)
+         
 
     def get_state(self) -> BattleState:
         return self.state.get_state()
@@ -210,39 +169,23 @@ class StateReader:
         self.condition_reader.updated = False
         self.hp_reader.updated = False
 
+from argparse import ArgumentParser
 
-'''
-    Main interface for managing the queue of ImageUpdates.
-'''
-class UpdateQueue():
-    def __init__(self, battle_state: Optional[BattleState] = None):
-        self.queue: Queue[ImageUpdate] = Queue()
-        self.state_reader: StateReader = StateReader(battle_state)
-        self.processor = ContinuousTask(self.queue, self.state_reader.handle_update)
-
-    async def put(self, item : ImageUpdate):
-        await self.queue.put(item)
-
-    # Waits for all items in the queue to be processed, then returns the current state
-    async def get_state(self) -> BattleState:
-        await self.processor.join()  # Wait for all items to be processed
-        return self.state_reader.get_state()
-
-    async def done(self):
-        '''
-        Determines if the queue is empty and all items have been processed.
-        '''
-        return self.state_reader.updated()
+# Parse the args for a battle state config to start the StateReader
+def parse_args():
+    parser = ArgumentParser(description="Reads state from continuous updates")
+    parser.add_argument('--config', type=str, default='config/example.yaml', help='Path to the configuration YAML file')
+    return parser.parse_args()
     
-    def reset(self):
-        '''
-        Resets the state reader and clears the queue.
-        '''
-        self.state_reader.reset()
-        self.queue = Queue()
+    
 
-    async def close(self):
-        '''
-        Closes the queue and cancels the processing task.
-        '''
-        await self.processor.close()
+if __name__ == "__main__":
+    from src.params.yaml_parser import load_battle_state_from_yaml
+    args = parse_args()
+    battle_state = load_battle_state_from_yaml(args.config)
+    reader = StateReader(battle_state)
+    callbacks = {
+        CONFIG: reader.handle_camera_config,
+        IMAGE_UPDATE: reader.handle_update_wrapper        
+    }
+    listen(callbacks)

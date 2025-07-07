@@ -78,6 +78,12 @@ def demonstrate_message_parsing():
     print(f"  Player active pokemon: {battle_state.player_team.pk_list[battle_state.player_active_mon].name}")
     print(f"  Opponent active pokemon: {battle_state.opponent_team.pk_list[battle_state.opponent_active_mon].name}")
 
+    # Example 5: Space in between Pokemon name.
+    print("\n--- Example 5: Space in between Pokemon name ---")
+    space_message = "Go! Bul by!"
+    changes = parse_update_message(space_message, battle_state, opponent=True)
+    print(f"Parsed changes: {changes}")
+    enact_changes(battle_state, changes, opponent=True)
 
 if __name__ == "__main__":
     demonstrate_message_parsing()
