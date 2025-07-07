@@ -55,6 +55,9 @@ class Move:
     def high_crit(self) -> bool:
         return "critRatio" in self.data and self.data["critRatio"] == 2
 
+    def trapping(self) -> bool:
+        return "volatileStatus" in self.data and self.data["volatileStatus"] == "partiallytrapped"
+
 
 class PokemonParser:
     def __init__(self, yaml_filepath: str):

@@ -41,11 +41,12 @@ class StaticMessages(Enum):
     DIG = "It dug a hole!"
     FLY = "It flew up high!"
     CONF = "It's confused!"
+    SUCK = "It sucked HP!"
     STARTCONF = "It became confused!"
     STARTFRZ = "It was frozen solid!"
     STARTPLZ = "It may not attack!"
     STARTSLP = "It fell asleep!"
-    STARTBRN = "Burnburnburn" # TODO: What is the actual message
+    STARTBRN = "It was burned!" 
     STATUSFAIL = "But, it failed!"
     STATUSBRN = "Burnburnburn" # TODO: What is the actual message
     PLZ = "It's fully paralyzed!"
@@ -58,7 +59,7 @@ class StaticMessages(Enum):
 class SecondLineMessages(Enum):
     STARTFRZ = "It was frozen solid!"
     STARTPLZ = "It may not attack!"
-    STARTBRN = "Burnburnburn" # TODO: What is the actual message
+    STARTBRN = "It was burned!" 
     STATUSBRN = "Burnburnburn" # TODO: What is the actual message
     CRIT = "Critical hit!"
     REST = "It regained health!"
@@ -69,9 +70,33 @@ SELF_AFFECT = [StaticMessages.SWITCH1, StaticMessages.SWITCH2, StaticMessages.DI
                StaticMessages.WOKE, StaticMessages.SLP, StaticMessages.PLZ, StaticMessages.FRZ, StaticMessages.REST,
                SecondLineMessages.REST, SecondLineMessages.NOCONF]
 
+class Stat(Enum):
+    ATK = "ATTACK"
+    DEF = "DEFENSE"
+    SPD = "SPEED"
+    SPC = "SPECIAL"
+
+STAT_MESSAGES = {
+        "%s greatly increased!": 2,
+        "%s increased!": 1,
+        "%s fell!": -1,
+        "%s greatly fell!": -2 # TODO: check this
+    }
 
 move_used = "%p used %m!"
 swap_in = ["Go! %p!", "Get 'em! %p", "Do it! %p"]
+
+def check_stat_message(line, threshold):
+    min_distance_so_far = threshold
+    result = None
+    for stat in Stat:
+        for msg in STAT_MESSAGES:
+            complete_message = msg.replace("%s", stat.value)
+            distance = LevenshteinDistance(line, complete_message)
+            if distance < min_distance_so_far:
+                result = (stat, STAT_MESSAGES[msg])
+                min_distance_so_far = distance
+    return result, min_distance_so_far
 
 
 def check_closest_message(textbox, pokemon_names, pokemon_config, max_distance = 5):
@@ -85,6 +110,7 @@ def check_closest_message(textbox, pokemon_names, pokemon_config, max_distance =
         if distance < min_distance_so_far:
             min_distance_so_far = distance
             min_message = static_enum
+
     for pokemon in pokemon_names:
         pokemon_caps = pokemon.upper()
         for swap_in_message in swap_in:
@@ -100,7 +126,13 @@ def check_closest_message(textbox, pokemon_names, pokemon_config, max_distance =
             distance = LevenshteinDistance(completed_message, msg)
             if distance < min_distance_so_far:
                 min_distance_so_far = distance
-                min_message = completed_message
+                min_message = move
+
+    stat_result, dist = check_stat_message(msg, min_distance_so_far)
+    if dist < min_distance_so_far:
+        min_distance_so_far = dist
+        min_message = stat_result
+
     min_second_message = None
     if len(messages) > 1:
         for msg in messages[1:]:
@@ -113,6 +145,10 @@ def check_closest_message(textbox, pokemon_names, pokemon_config, max_distance =
                     if distance < min_distance_second_line:
                         min_second_message = second_msg
                         min_distance_second_line = distance
+                stat_result, dist = check_stat_message(msg, min_distance_second_line)
+                if dist < min_distance_so_far:
+                    min_distance_second_line = dist
+                    min_message = stat_result
             if min_second_message is not None:
                 break
     return min_message, min_second_message

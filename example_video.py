@@ -83,27 +83,29 @@ if __name__ == "__main__":
   # GREEN if executing
   elif machine.state == GameState.EXECUTION:
    img[:,:,1] = 255
-  #if machine.state == GameState.STARTING or machine.state == GameState.EXECUTION:
-  #  if box_fitter.check_lines(img):
-  #    quote_text_box = display_data.crop_bbox(img, display_data.quote_bbox)
-  #    color = display_data.message_box_color(quote_text_box)
-  #    text = filter_text(quote_text_box, display_data.min_text, display_data.max_text)
-  #    display_data.set_bbox(img, display_data.quote_bbox, text)
-  #    turn = game_state.Turn.P1 if color == display_data.Color.P1 else game_state.Turn.P2
-  #    if not box_active:
-  #        box_active=True
-  #        queue.add_image_to_processing(text, turn)
-  #  else:
-  #    box_active=False
-  #else:
-  #    box_active=False
-  #results = queue.check()
-  #for r in results:
-  #    text, turn = r
-  #    if turn == game_state.Turn.P1:
-  #        state.update_p1_status(text[0], text[1])
-  #    else:
-  #        state.update_p2_status(text[0], text[1])
+  if machine.state == GameState.STARTING or machine.state == GameState.EXECUTION:
+    if box_fitter.check_lines(img):
+      quote_text_box = display_data.crop_bbox(img, display_data.quote_bbox)
+      color = display_data.message_box_color(quote_text_box)
+      text = filter_text(quote_text_box, display_data.min_text, display_data.max_text)
+      display_data.set_bbox(img, display_data.quote_bbox, text)
+      turn = game_state.Turn.P1 if color == display_data.Color.P1 else game_state.Turn.P2
+      if not box_active:
+          box_active=True
+          queue.add_image_to_processing(text, turn)
+    else:
+      box_active=False
+  else:
+      box_active=False
+  results = queue.check()
+  for r in results:
+      text, turn = r
+      if turn == game_state.Turn.P1:
+          state.update_p1_status(text[0], text[1])
+          state.update_p1_boosts(text[0], text[1])
+      else:
+          state.update_p2_status(text[0], text[1])
+          state.update_p2_boosts(text[0], text[1])
     
  
   if machine.state == GameState.DECISION:

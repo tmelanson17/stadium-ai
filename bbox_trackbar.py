@@ -3,6 +3,9 @@ import numpy as np
 
 #cap = cv.imread("data/box_2.jpg")
 cap = cv.VideoCapture(0) #"data/freebattle_small.mkv")
+cap.set(cv.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
+cap.set(cv.CAP_PROP_FPS, 30)
 if not cap.isOpened():
  print("Cannot open camera")
  exit()
