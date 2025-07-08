@@ -62,8 +62,8 @@ class ImageUpdateSerializer:
         
         if self.shared_image_list is not None:
             # Store image in SharedImageList and get index
-            # Note: Since SharedImageList doesn't have an explicit add method,
-            # we'll assume the image is already stored and return the current index
+            frame = self.shared_image_list.get_new_frame()
+            frame[:] = image_update.image
             image_index = self.shared_image_list.current_index
         else:
             # If no SharedImageList is available, we'll store minimal image metadata

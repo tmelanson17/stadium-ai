@@ -110,6 +110,10 @@ class PlayerHPReader:
             return None
         print(f"Updating HP for {update.player_id.value}...")
         hp = get_hp(update.image, update.roi.to_coord())
+        print(f"Read HP: {hp} for player {update.player_id.value}")
+        if hp < 0:
+            print("Invalid HP read, skipping update.")
+            return
         # TODO: Have some filtering on the read HP
         state = battle_state.get_state()
         opponent = update.player_id != PlayerID.P1

@@ -6,9 +6,9 @@ from src.state_reader.tesseract import read_text_from_roi
 # Portions of screen
 POKEMON_NAME = (0, 0.4)
 STATUS = ((0.38, 0.65), (0.4, 1.0))
-HP = ((0.15, 0.5), (0.7, 0.95))
+HP = ((0.1, 0.5), (0.75, 0.95))
 
-HP_TESSERACT_CONFIG="--oem 1 --psm 12 -l eng --user-patterns patterns/hp.pattern -c tessedit_char_whitelist=0123456789"
+HP_TESSERACT_CONFIG="--oem 1 --psm 13 -l eng --user-patterns patterns/hp.pattern -c tessedit_char_whitelist=0123456789"
 
 # TODO : Move this to a more central location, as this is used often.
 BBox: TypeAlias = Tuple[Tuple[int, int], Tuple[int, int]]
@@ -38,10 +38,10 @@ def get_hp(image: np.ndarray, roi: BBox) -> int:
         (since the size of the HP box is mostly static).
     """
     hp_section = get_hp_section(roi)
-    hp_strings = read_text_from_roi(image, hp_section, tesseract_config=HP_TESSERACT_CONFIG)
+    hp_strings = read_text_from_roi(image, hp_section, tesseract_config=HP_TESSERACT_CONFIG, preprocess=True, use_otsu=True, remove_noise=True)
     hp_strings = [line.strip() for line in hp_strings if line is not None]
     # Clean any non-numeric characters
     hp_string = ''.join(filter(str.isdigit, ' '.join(hp_strings)))
     if len(hp_string) == 0:
-        return 0
+        return -1
     return int(hp_string)

@@ -19,7 +19,7 @@ class Messages(Enum):
     ATTACKED_ITSELF = "It attacked itself!"
     SUCKED_HP = "It sucked HP!"
     FAILED = "But, it failed!"
-    FLINCH = "Flinch???"  # TODO: What is the flinch message?
+    TRAPPED = "It can't move!"  
     REGAINED_HEALTH = "It regained health!"
     FAINTED = "OK! Come back!"
     
@@ -71,7 +71,6 @@ no_effect_messages = [
     Messages.ATTACKED_ITSELF.value,
     Messages.SUCKED_HP.value,
     Messages.FAILED.value,
-    Messages.FLINCH.value,
     Messages.REGAINED_HEALTH.value
 ]
 
@@ -94,6 +93,7 @@ receiver_effect_messages = {
     Messages.BADLY_POISONED.value: ("receiver", "status", Status.POISONED),
     Messages.FELL_ASLEEP.value: ("receiver", "status", Status.SLEEP),
     Messages.MAY_NOT_ATTACK.value: ("receiver", "status", Status.PARALYZED),
+    Messages.TRAPPED.value: ("receiver", "trapped", True),
 }
 
 # TODO: We'll ignore HAZE, because it's not possible in Petit Cup and will be confusing to implement.
@@ -107,7 +107,10 @@ STATS = {"ATTACK": "attack_boost", "DEFENSE": "defense_boost", "SPECIAL": "speci
 MAGNITUDES = {"greatly ": 2, "": 1}
 DIRECTIONS = {"increased": +1, "fell": -1}
 
-SWITCHOUT = "Go! {}!"
+SWITCHOUT = [
+    "Go! {}!",
+    "Do it! {}!",
+]
 
 def parse_update_message(message: str, battle_state: BattleState, opponent: bool = False):
     message_map: Dict[str, Optional[Tuple]] = {m: None for m in no_effect_messages}
@@ -139,8 +142,10 @@ def parse_update_message(message: str, battle_state: BattleState, opponent: bool
                 )
 
     for i, pokemon in enumerate(team):
-        if pokemon.name:
-            message_map[SWITCHOUT.format(pokemon.name)] = ("actor", "switch", i)
+        for switchout in SWITCHOUT:
+            if pokemon.name:
+                key_str = switchout.format(pokemon.name)
+                message_map[key_str] = ("actor", "switch", i)
     for move in [self_pokemon.move1, self_pokemon.move2, self_pokemon.move3, self_pokemon.move4]:
         if move and move.name:
             move_name = move.name.upper()

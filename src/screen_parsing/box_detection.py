@@ -89,7 +89,7 @@ class BoxDetection:
         self.p1_hp_boxes = BoxAverageFilter(window_size=15)  # Filter for P1 HP boxes
         self.p2_top_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 top HP boxes
         self.p2_bottom_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 bottom HP boxes
-        self.status_boxes = BoxAverageFilter(window_size=5)  # Filter for status boxes
+        self.status_boxes = BoxAverageFilter(window_size=10)  # Filter for status boxes
         self.P1_OUTLIER_THRESHOLD = 0.05  # Threshold for P1 HP box detection
         self.P2_OUTLIER_THRESHOLD = 0.1  # Threshold for P2 HP box detection
         self.STATUS_OUTLIER_THRESHOLD = 0.05  # Threshold for status box detection

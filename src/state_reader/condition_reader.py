@@ -29,7 +29,8 @@ from src.state_reader.tesseract import read_text_from_roi
 from src.state_reader.state_updater import enact_changes
 from src.state.pokestate import BattleState
 
-CONDITION_TESSERACT_CONFIG = "--oem 1 --psm 6 -l eng"
+# Note: Nicknames with numbers are not supported by the current regex.
+CONDITION_TESSERACT_CONFIG = "--oem 1 --psm 6 -l eng -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?,.:'\"-"
 
 def update_state(
    raw_text: List[Optional[str]],

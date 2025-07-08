@@ -64,8 +64,7 @@ def main(args):
 
     # Read a frame from the video source
     while True:
-        frame = shm.get_new_frame()
-        ret, _ = cap.read(frame)
+        ret, frame = cap.read()
         if not ret:
             print("Exiting...")
             break
@@ -82,13 +81,6 @@ def main(args):
                 # print(f"Published ImageUpdate: {update.message_type} for player {update.player_id}")
             else:
                 print(f"Unexpected update type: {type(update)}")
-
-        # if await update_queue.done():
-        #     # Process the updates in the queue
-        #     battle_state = await update_queue.get_state()
-        #     print("Battle State Updated:")
-        #     print_battle_state(battle_state)
-        #     update_queue.reset()
 
 
         # Display the image in a window
