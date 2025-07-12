@@ -14,8 +14,10 @@ from src.state_reader.state_updater import enact_changes
 from src.state_reader.hp_reader import get_hp
 from src.utils.shared_image_list import SharedImageList
 from src.utils.serialization import deserialize_image_update
+from src.utils.battle_state_serialization import BattleStateSerializer
 from src.rabbitmq.receive import listen
-from src.rabbitmq.topics import CONFIG, IMAGE_UPDATE
+from src.rabbitmq.send import publish_message_to_topic
+from src.rabbitmq.topics import CONFIG, IMAGE_UPDATE, BATTLE_STATE_UPDATE, CONTROLLER_EXCHANGE
     
 '''
     Wrapper for BattleState to handle updates and locking.
@@ -132,6 +134,7 @@ class StateReader:
         self.condition_reader = BattleConditionReader()
         self.hp_reader = PlayerHPReader()
         self.shm = None
+        self.serializer = BattleStateSerializer()
 
     def handle_update(self, update: ImageUpdate):
         # This method should handle the update and modify the internal state accordingly
@@ -152,6 +155,14 @@ class StateReader:
             print("Failed to deserialize ImageUpdate, skipping.")
             return
         self.handle_update(update)
+        # This is assuming the HP update is before a decision needs to be made.
+        # TODO: Find another way to handle this.
+        if update.message_type == MessageType.HP:
+            publish_message_to_topic(
+                exchange=CONTROLLER_EXCHANGE,
+                topic=BATTLE_STATE_UPDATE,
+                message=self.serializer.to_dict(self.state.get_state())
+            )
 
     def handle_camera_config(self, config: Dict[str, str]):
         self.shm = SharedImageList(config, create=False)
@@ -172,19 +183,20 @@ class StateReader:
         '''
         self.condition_reader.updated = False
         self.hp_reader.updated = False
-
-from argparse import ArgumentParser
-
-# Parse the args for a battle state config to start the StateReader
-def parse_args():
-    parser = ArgumentParser(description="Reads state from continuous updates")
-    parser.add_argument('--config', type=str, default='config/example.yaml', help='Path to the configuration YAML file')
-    return parser.parse_args()
     
     
 
 if __name__ == "__main__":
     from src.params.yaml_parser import load_battle_state_from_yaml
+
+    from argparse import ArgumentParser
+
+    # Parse the args for a battle state config to start the StateReader
+    def parse_args():
+        parser = ArgumentParser(description="Reads state from continuous updates")
+        parser.add_argument('--config', type=str, default='config/example.yaml', help='Path to the configuration YAML file')
+        return parser.parse_args()
+
     args = parse_args()
     battle_state = load_battle_state_from_yaml(args.config)
     reader = StateReader(battle_state)
@@ -192,4 +204,4 @@ if __name__ == "__main__":
         CONFIG: reader.handle_camera_config,
         IMAGE_UPDATE: reader.handle_update_wrapper        
     }
-    listen(callbacks)
+    listen("image_data", callbacks)

@@ -1,0 +1,99 @@
+Team 1:
+  - species: "Charizard"
+    nickname: "CHARIZARD"
+    level: 50
+    moves:
+      - "Fire Blast"
+      - "Fly"
+      - "Fire Spin"
+      - "Slash"
+  - species: "Blastoise"
+    nickname: "BLASTOISE"
+    level: 50
+    moves:
+      - "Hydro Pump"
+      - "Skull Bash"
+      - "Withdraw"
+      - "Tail Whip"
+  - species: "Charmander"
+    nickname: "CHARMANDER"
+    level: 50
+    moves:
+      - "Flamethrower"
+      - "Body Slam"
+      - "Seismic Toss"
+      - "Dig"
+  - species: "Pikachu"
+    nickname: "PIKACHU"
+    level: 50
+    moves:
+      - "Thunderbolt"
+      - "Swift"
+      - "Reflect"
+      - "Thunder Wave"
+  - species: "Raichu"
+    nickname: "RAICHU"
+    level: 50
+    moves:
+      - "Thunder"
+      - "Thunder Wave"
+      - "Quick Attack"
+      - "Mega Kick"
+  - species: "Beedrill"
+    nickname: "BEEDRILL"
+    level: 50
+    moves:
+      - "Twinneedle"
+      - "Hyper Beam"
+      - "Mega Drain"
+      - "Focus Energy"
+
+Team 2:
+  - species: "Pidgeot"
+    nickname: "PIDGEOT"
+    level: 50
+    moves:
+      - "Sand-Attack"
+      - "Mirror Move"
+      - "Fly"
+      - "Quick Attack"
+  - species: "Nidoking"
+    nickname: "NIDOKING"
+    level: 50
+    moves:
+      - "Substitute"
+      - "Earthquake"
+      - "Horn Drill"
+      - "Rage"
+  - species: "Fearow"
+    nickname: "FEAROW"
+    level: 50
+    moves:
+      - "Swift"
+      - "Fury Attack"
+      - "Drill Peck"
+      - "Mirror Move"
+  - species: "Poliwrath"
+    nickname: "POLIWRATH"
+    level: 50
+    moves:
+      - "Hydro Pump"
+      - "Counter"
+      - "Submission"
+      - "Hypnosis"
+  - species: "Machamp"
+    nickname: "MACHAMP"
+    level: 50
+    moves:
+      - "Focus Energy"
+      - "Low Kick"
+      - "Strength"
+      - "Counter"
+  - species: "Graveler"
+    nickname: "GRAVELER"
+    level: 50
+    moves:
+      - "Selfdestruct"
+      - "Strength"
+      - "Earthquake"
+      - "Seismic Toss"

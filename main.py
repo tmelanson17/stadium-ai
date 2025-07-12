@@ -59,7 +59,7 @@ def main(args):
         'n_shmem_frames': str(args.n_shmem_frames),
     }
     shm = SharedImageList(camera_config=camera_config, create=True)
-    publish_message_to_topic('camera_config', camera_config)
+    publish_message_to_topic('image_data', CONFIG, camera_config)
     idx=0
 
     # Read a frame from the video source
@@ -77,7 +77,7 @@ def main(args):
         for update in processed_updates:
             if isinstance(update, ImageUpdate):
                 # Add the update to the queue for processing
-                publish_message_to_topic(IMAGE_UPDATE, serialize_image_update(update, shm))
+                publish_message_to_topic('image_data', IMAGE_UPDATE, serialize_image_update(update, shm))
                 # print(f"Published ImageUpdate: {update.message_type} for player {update.player_id}")
             else:
                 print(f"Unexpected update type: {type(update)}")

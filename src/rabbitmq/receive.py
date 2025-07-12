@@ -6,7 +6,7 @@ from typing import Dict, Callable
 import pika.adapters.blocking_connection
 import pika.spec
 
-def listen(callbacks: Dict[str, Callable[[Dict], None]]) -> None:
+def listen(exchange: str, callbacks: Dict[str, Callable[[Dict], None]]) -> None:
     """
     Subscribes to a RabbitMQ topic and sets up a callback for incoming messages.
 
@@ -28,7 +28,7 @@ def listen(callbacks: Dict[str, Callable[[Dict], None]]) -> None:
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
-    channel.exchange_declare(exchange="image_data", exchange_type='direct')
+    channel.exchange_declare(exchange=exchange, exchange_type='direct')
 
     # Declare the exchange for the topic
     result = channel.queue_declare(queue='', exclusive=True)
@@ -36,7 +36,7 @@ def listen(callbacks: Dict[str, Callable[[Dict], None]]) -> None:
 
     for topic in callbacks.keys():
 
-        channel.queue_bind(exchange="image_data", queue=queue_name, routing_key=topic)
+        channel.queue_bind(exchange=exchange, queue=queue_name, routing_key=topic)
 
     channel.basic_consume(queue=queue_name, on_message_callback=on_message, auto_ack=False)
     print(f" [*] Waiting for messages in topics '{list(callbacks.keys())}'. To exit press CTRL+C")

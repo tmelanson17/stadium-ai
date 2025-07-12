@@ -7,6 +7,8 @@ from typing import Dict, Optional, Tuple
 import serial
 import time
 
+from src.controller.controller_node import Controller
+
 # Controller maps to the option of the specified index.
 _CHARACTER_MAP = [
     '^',
@@ -17,7 +19,7 @@ _CHARACTER_MAP = [
     'B',
 ]
 
-class SerialController:
+class SerialController(Controller):
     def __init__(self, port: str, baudrate: int = 9600):
         """
         Initialize the SerialController with the specified serial port.
