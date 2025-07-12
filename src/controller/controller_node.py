@@ -3,7 +3,7 @@ from typing import Dict, Optional
 from src.rabbitmq.receive import listen
 from src.utils.battle_state_serialization import BattleStateSerializer
 from src.controller.base import Controller, Agent
-from src.rabbitmq.topics import CONTROLLER_EXCHANGE, BATTLE_STATE_UPDATE
+from src.rabbitmq.topics import CONTROLLER_EXCHANGE, BATTLE_STATE_UPDATE, TEAM_PREVIEW
 
 '''
 Service for handling output controls.
@@ -16,14 +16,23 @@ class OutputControlService:
         self.serializer = BattleStateSerializer()
         self.callbacks = {
             BATTLE_STATE_UPDATE: self.update,
+            TEAM_PREVIEW: self.handle_team_preview,  # Handle team preview commands
         }
         listen(CONTROLLER_EXCHANGE, self.callbacks)
 
-    def update(self, battle_state: Dict[str, str]) -> None:
-        self.battle_state = self.serializer.from_dict(battle_state)
+    def update(self, json_input: Dict[str, str]) -> None:
+        self.battle_state = self.serializer.from_dict(json_input)
         action = self.agent.choose_action(self.battle_state)
         print(f"Chosen action: {action}")
         self.controller.send_command(action)
+    
+    def handle_team_preview(self, json_input: Dict[str, str]) -> None:
+        if "teampreview" not in json_input:
+            print("No team preview command found in input.")
+            return
+        # If a command is received, send it directly to the controller
+        commands = json_input["teampreview"]
+        self.controller.send_command(commands)
 
 
 class MockController(Controller):

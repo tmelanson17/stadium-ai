@@ -177,3 +177,15 @@ def parse_move_from_name(move_name: str) -> MoveState:
         pp_max=move_data.pp,
         disabled=False
     )
+
+def save_dict_to_yaml(data: Dict[str, Any], yaml_path: str):
+    """
+    Save a dictionary to a YAML file.
+    
+    Args:
+        data: Dictionary to save
+        yaml_path: Path to the output YAML file
+    """
+    with open(yaml_path, 'w', encoding='utf-8') as file:
+        yaml.dump(data, file, default_flow_style=False, allow_unicode=True)
+    print(f"Data saved to {yaml_path}")

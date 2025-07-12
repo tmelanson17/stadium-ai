@@ -157,12 +157,12 @@ class StateReader:
         self.handle_update(update)
         # This is assuming the HP update is before a decision needs to be made.
         # TODO: Find another way to handle this.
-        if update.message_type == MessageType.HP:
-            publish_message_to_topic(
-                exchange=CONTROLLER_EXCHANGE,
-                topic=BATTLE_STATE_UPDATE,
-                message=self.serializer.to_dict(self.state.get_state())
-            )
+        # if update.message_type == MessageType.HP:
+        #     publish_message_to_topic(
+        #         exchange=CONTROLLER_EXCHANGE,
+        #         topic=BATTLE_STATE_UPDATE,
+        #         message=self.serializer.to_dict(self.state.get_state())
+        #     )
 
     def handle_camera_config(self, config: Dict[str, str]):
         self.shm = SharedImageList(config, create=False)

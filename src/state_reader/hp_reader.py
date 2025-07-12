@@ -1,17 +1,59 @@
+import cv2
 import numpy as np
 
-from typing import Tuple, TypeAlias
-from src.state_reader.tesseract import read_text_from_roi
+from typing import Tuple, TypeAlias, List
+# TODO: Move preprocessing functions to a common module
+from src.state_reader.tesseract import preprocess_for_ocr, remove_large_contours
 
 # Portions of screen
 POKEMON_NAME = (0, 0.4)
 STATUS = ((0.38, 0.65), (0.4, 1.0))
 HP = ((0.1, 0.5), (0.75, 0.95))
+SIMILARITY_THRESHOLD = 0.2
+NUMBERS = [
+    cv2.imread(f"numbers/processed_{i}.jpg", cv2.IMREAD_GRAYSCALE)
+    for i in range(10)
+]
 
-HP_TESSERACT_CONFIG="--oem 1 --psm 13 -l eng --user-patterns patterns/hp.pattern -c tessedit_char_whitelist=0123456789"
+# HP_TESSERACT_CONFIG="--oem 1 --psm 13 -l eng --user-patterns patterns/hp.pattern -c tessedit_char_whitelist=0123456789"
 
 # TODO : Move this to a more central location, as this is used often.
 BBox: TypeAlias = Tuple[Tuple[int, int], Tuple[int, int]]
+
+def detect_numbers(
+    roi: np.ndarray) -> List[str]:
+    """
+    Match numbers in the image to the specified region of interest (ROI).
+
+    Args:
+        roi: Region of interest as a subset of the image.
+
+    Returns:
+        Numbers detected, combined into a string
+    """
+    # Detect keypoints and descriptors in the source image
+    roi_negative = cv2.bitwise_not(roi)
+    shapes_in_image, _= cv2.findContours(roi_negative, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    regions_of_interest = [cv2.boundingRect(cnt) for cnt in shapes_in_image if cv2.contourArea(cnt) > 100]
+    regions_of_interest = sorted(regions_of_interest, key=lambda x: x[0])  # Sort by x-coordinate
+    detected_numbers = []
+    for box in regions_of_interest:
+        if box is None or len(box) != 4:
+            print(f"Skipping invalid box: {box}")
+            continue
+        character = roi_negative[box[1]:box[1]+box[3], box[0]:box[0]+box[2]]
+        max_similarity = 0
+        argmax_similarity = -1
+        for i, img in enumerate(NUMBERS):
+            character_resized = cv2.resize(character, (img.shape[1], img.shape[0]))
+            score = cv2.matchTemplate(character_resized, img, cv2.TM_CCOEFF_NORMED)
+            if score.max() > max_similarity:
+                argmax_similarity = i
+                max_similarity = score.max()
+        if max_similarity > SIMILARITY_THRESHOLD:  # Threshold for a good match
+            detected_numbers.append(argmax_similarity)
+
+    return map(str, detected_numbers)
 
 def get_hp_section(hp_bbox: BBox) -> BBox:
     """
@@ -31,17 +73,24 @@ def get_hp_section(hp_bbox: BBox) -> BBox:
     y2 -= int((1 - HP[1][1]) * (y2 - y1))
     return ((x1, y1), (x2, y2))
 
+i=0
 def get_hp(image: np.ndarray, roi: BBox) -> int:
     """
         Retrieves a raw hp value from the image
         by looking at a hard-coded sectoin of the HP ROI box
         (since the size of the HP box is mostly static).
     """
-    hp_section = get_hp_section(roi)
-    hp_strings = read_text_from_roi(image, hp_section, tesseract_config=HP_TESSERACT_CONFIG, preprocess=True, use_otsu=True, remove_noise=True)
-    hp_strings = [line.strip() for line in hp_strings if line is not None]
+    global i
+    ((x1, y1), (x2, y2)) = get_hp_section(roi)
+    preprocessed = preprocess_for_ocr(image[y1:y2, x1:x2], use_otsu=True)
+    denoised = remove_large_contours(preprocessed)
+    cv2.imwrite(f"debug/hp_section_{i}.png", denoised)
+    i+=1
+    hp_strings = detect_numbers(denoised)
+    hp_string = ''.join(hp_strings)
+    # hp_strings = [line.strip() for line in hp_strings if line is not None]
+    # hp_string = ''.join(filter(str.isdigit, ' '.join(hp_strings)))
     # Clean any non-numeric characters
-    hp_string = ''.join(filter(str.isdigit, ' '.join(hp_strings)))
     if len(hp_string) == 0:
         return -1
     return int(hp_string)

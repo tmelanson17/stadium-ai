@@ -16,6 +16,8 @@ class Messages(Enum):
     ENOUGH_COME_BACK = "Enough! Come back!"
     CRITICAL_HIT = "Critical hit!"
     ATTACK_MISSED = "Its attack missed!"
+    OHKO_MISSED = "It was unaffected!"
+    NO_EFFECT = "It had no effect!"
     ATTACKED_ITSELF = "It attacked itself!"
     SUCKED_HP = "It sucked HP!"
     FAILED = "But, it failed!"
@@ -68,6 +70,8 @@ no_effect_messages = [
     Messages.ENOUGH_COME_BACK.value,
     Messages.CRITICAL_HIT.value,
     Messages.ATTACK_MISSED.value,
+    Messages.OHKO_MISSED.value,
+    Messages.NO_EFFECT.value,
     Messages.ATTACKED_ITSELF.value,
     Messages.SUCKED_HP.value,
     Messages.FAILED.value,
@@ -110,6 +114,7 @@ DIRECTIONS = {"increased": +1, "fell": -1}
 SWITCHOUT = [
     "Go! {}!",
     "Do it! {}!",
+    "Get 'em! {}!",
 ]
 
 def parse_update_message(message: str, battle_state: BattleState, opponent: bool = False):

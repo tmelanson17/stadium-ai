@@ -3,7 +3,6 @@
 # If switch, it will switch the active mon to the one specified (0-POKEMON_TEAM).
 # If move, it will use the move specified (0-3) on the active mon.
 # This is converted to a set of commands to send to the controller via serial port.
-from typing import Dict, Optional, Tuple
 import serial
 import time
 
@@ -35,6 +34,18 @@ class SerialController(Controller):
         
         # Initialize serial connection here (omitted for brevity)
     
+    def serial_write(self, data: str) -> None:
+        """
+        Write data to the serial port.
+        
+        Args:
+            data: The data string to write to the serial port
+        """
+        self.serial_connection.write(data.encode('utf-8'))
+        self.serial_connection.flush()
+        time.sleep(0.1)  # Wait for the controller to process the command
+        print(self.serial_connection.read(1))  # Read response from controller
+    
     def send_command(self, command: str) -> None:
         """
         Send a command to the serial port.
@@ -43,6 +54,13 @@ class SerialController(Controller):
             command: The command string to send
         """
         command_list = command.strip().split()
+        # Handle direct commands for Team Preview.
+        if all([c.isdigit() for c in command_list]):
+            for idx in command_list:
+                if int(idx) < 0 or int(idx) >= len(_CHARACTER_MAP):
+                    raise ValueError(f"Index {idx} out of range for character map.")
+                self.serial_write(_CHARACTER_MAP[int(idx)])
+        # -------------------------------------------
         if len(command_list) != 2:
             raise ValueError("Command must be <action> <index>.")
         action, index = command_list
@@ -51,14 +69,8 @@ class SerialController(Controller):
         if not index.isdigit() or int(index) < 0:
             raise ValueError("Index must be a non-negative integer.")
         controller_action = "B" if action == "switch" else "A"
-        self.serial_connection.write(controller_action.encode('utf-8'))
-        self.serial_connection.flush()  # Ensure the command is sent immediately
-        time.sleep(0.1)  # Wait for the controller to process the command
-        print(self.serial_connection.read(1))  # Read response from controller
-        self.serial_connection.write(_CHARACTER_MAP[int(index)].encode('utf-8'))
-        self.serial_connection.flush()  # Ensure the command is sent immediately
-        time.sleep(0.1)  # Wait for the controller to process the command
-        print(self.serial_connection.read(1))  # Read response from controller
+        self.serial_write(controller_action)
+        self.serial_write(_CHARACTER_MAP[int(index)])
 
 if __name__ == "__main__":
     import argparse

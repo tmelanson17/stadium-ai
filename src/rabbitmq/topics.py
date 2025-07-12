@@ -4,6 +4,7 @@
 CONFIG="camera_config"
 IMAGE_UPDATE="image_update"
 BATTLE_STATE_UPDATE="battle_state_update"
+TEAM_PREVIEW = "team_preview"
 
 # Exchange names
 CONTROLLER_EXCHANGE = "controller_exchange"

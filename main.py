@@ -8,7 +8,6 @@ from src.display.draw import draw_updates, draw_mode
 from src.params.yaml_parser import load_battle_state_from_yaml
 from src.rabbitmq.send import publish_message_to_topic
 from src.rabbitmq.topics import IMAGE_UPDATE, CONFIG
-from src.state.pokestate import print_battle_state
 from src.screen_parsing.box_detection import BoxDetection
 from src.screen_parsing.stadium_mode import StadiumModeParser
 from src.screen_parsing.update_processor import UpdateProcessor
@@ -30,6 +29,20 @@ def parse_args():
 def check_args(args):
     if not args.image_path and not args.camera:
         raise ValueError("Either image path or camera option must be provided.")
+
+
+def handle_teampreview_command():
+    """
+    Send Team Preview data over to the controller.
+    For now, the team preview will be a random list of indices.
+    """
+    from src.rabbitmq.topics import CONTROLLER_EXCHANGE, TEAM_PREVIEW
+    # Choose 3 from range(6) for a team preview
+    indices = np.random.choice(range(6), 3, replace=False)
+    teampreview = " ".join(map(str, indices)) + " 4" # 4 is the index for the "Ready" command (A)
+    command = {"teampreview": teampreview}
+    print(f"Sending Team Preview command: {command}")
+    publish_message_to_topic(CONTROLLER_EXCHANGE, TEAM_PREVIEW, command)
 
 def main(args):
     # Load video capture from file or camera
@@ -60,6 +73,7 @@ def main(args):
     }
     shm = SharedImageList(camera_config=camera_config, create=True)
     publish_message_to_topic('image_data', CONFIG, camera_config)
+    handle_teampreview_command()
     idx=0
 
     # Read a frame from the video source
@@ -68,6 +82,9 @@ def main(args):
         if not ret:
             print("Exiting...")
             break
+        if not stadium_mode_parser.check_battle_begin(frame):
+            print("Battle has not begun yet, skipping frame.")
+            continue
 
         updates = box_detection.update(frame)
         stadium_mode = stadium_mode_parser.parse(updates)
