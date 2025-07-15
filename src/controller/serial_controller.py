@@ -18,6 +18,15 @@ _CHARACTER_MAP = [
     'B',
 ]
 
+_TEAM_PREVIEW_MAP = [
+    'B',
+    '<', 
+    '^',
+    'A',
+    'V',
+    '>'
+]
+
 class SerialController(Controller):
     def __init__(self, port: str, baudrate: int = 9600):
         """
@@ -43,7 +52,7 @@ class SerialController(Controller):
         """
         self.serial_connection.write(data.encode('utf-8'))
         self.serial_connection.flush()
-        time.sleep(0.1)  # Wait for the controller to process the command
+        time.sleep(0.5)  # Wait for the controller to process the command
         print(self.serial_connection.read(1))  # Read response from controller
     
     def send_command(self, command: str) -> None:
@@ -59,7 +68,9 @@ class SerialController(Controller):
             for idx in command_list:
                 if int(idx) < 0 or int(idx) >= len(_CHARACTER_MAP):
                     raise ValueError(f"Index {idx} out of range for character map.")
-                self.serial_write(_CHARACTER_MAP[int(idx)])
+                self.serial_write(_TEAM_PREVIEW_MAP[int(idx)])
+            self.serial_write("A")
+            return
         # -------------------------------------------
         if len(command_list) != 2:
             raise ValueError("Command must be <action> <index>.")

@@ -86,9 +86,9 @@ Uses an AverageFilter to smooth out the location of the boxes over time and dete
 class BoxDetection:
 
     def __init__(self):
-        self.p1_hp_boxes = BoxAverageFilter(window_size=15)  # Filter for P1 HP boxes
-        self.p2_top_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 top HP boxes
-        self.p2_bottom_hp_boxes = BoxAverageFilter(window_size=10)  # Filter for P2 bottom HP boxes
+        self.p1_hp_boxes = BoxAverageFilter(window_size=7)  # Filter for P1 HP boxes
+        self.p2_top_hp_boxes = BoxAverageFilter(window_size=5)  # Filter for P2 top HP boxes
+        self.p2_bottom_hp_boxes = BoxAverageFilter(window_size=5)  # Filter for P2 bottom HP boxes
         self.status_boxes = BoxAverageFilter(window_size=10)  # Filter for status boxes
         self.P1_OUTLIER_THRESHOLD = 0.05  # Threshold for P1 HP box detection
         self.P2_OUTLIER_THRESHOLD = 0.1  # Threshold for P2 HP box detection
@@ -132,9 +132,9 @@ class BoxDetection:
         blurred = cv2.GaussianBlur(normalized_img, (5,5), 1.0)  # Apply median blur to the image
         # Perform Canny edge detection on the input image
         # edges = cv2.Canny(blurred, threshold1=120, threshold2=300)
-        edges = cv2.Canny(blurred, threshold1=100, threshold2=300)
+        edges = cv2.Canny(blurred, threshold1=40, threshold2=120)
 
-        morphed_img = _apply_morphology(edges, kernel_size=(3, 3))  # Apply morphology to enhance edges
+        morphed_img = _apply_morphology(edges, kernel_size=(4, 4))  # Apply morphology to enhance edges
 
         # Invert the edges image to get negative edges
         negative_edges = cv2.bitwise_not(morphed_img)
@@ -147,11 +147,10 @@ class BoxDetection:
         contours_filtered = [cnt for cnt in contours if cv2.contourArea(cnt) > 0.01 * img_area and cv2.contourArea(cnt) < 0.5 * img_area]
         
         contours_unique = _filter_unique_contours(contours_filtered, min_iou=0.3)
-        return contours_unique
+        return contours_unique, negative_edges
 
-    def update(self, input_img: np.ndarray) -> Sequence[ImageUpdate]:
-        contours_unique = self._detect_contours(input_img)
-        ratio_shift = 1.0 # Ratio shift to account for different screen sizes or resolutions
+    def update(self, input_img: np.ndarray, read_condition_box: bool) -> Sequence[ImageUpdate]:
+        contours_unique, _ = self._detect_contours(input_img)
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
         updates = []
         for cnt in contours_unique:
@@ -172,22 +171,21 @@ class BoxDetection:
 
             box = None
             is_hp_box = False
-            if ratio > HP_BOX_RATIO * ratio_shift * 0.95 and ratio < HP_BOX_RATIO * ratio_shift * 1.05: # Draw a rectangle around the HP box
+            if ratio > HP_BOX_RATIO * 0.9 and ratio < HP_BOX_RATIO * 1.1: # Draw a rectangle around the HP box
                 # Draw point for HP box location
                 box = _get_hp_box_location(x, y, w, h, 1.0, 0.0)
                 is_hp_box = True
-            elif ratio > P1_BOX_RATIO * ratio_shift * 0.9 and ratio < P1_BOX_RATIO * ratio_shift * 1.1:
-                # Draw a rectangle around the P1 box
-                box = _get_hp_box_location(x, y, w, h, HP_P_HEIGHT, P_P1_LOCATION_V if p1 else P_P2_LOCATION_V)
-                is_hp_box = True
-            elif ratio > FULL_BOX_RATIO * ratio_shift * 0.9 and ratio < FULL_BOX_RATIO * ratio_shift * 1.1:
-                # Draw a rectangle around the full box
-                box = _get_hp_box_location(x, y, w, h, HP_FULL_HEIGHT, FULL_P1_LOCATION_V if p1 else FULL_P2_LOCATION_V)
-                is_hp_box = True
-            elif ratio > STATUS_BOX_RATIO * ratio_shift * 0.9 and ratio < STATUS_BOX_RATIO * ratio_shift * 1.1:
+            # elif ratio > P1_BOX_RATIO * 0.9 and ratio < P1_BOX_RATIO * 1.1:
+            #     # Draw a rectangle around the P1 box
+            #     box = _get_hp_box_location(x, y, w, h, HP_P_HEIGHT, P_P1_LOCATION_V if p1 else P_P2_LOCATION_V)
+            #     is_hp_box = True
+            # elif ratio > FULL_BOX_RATIO * 0.9 and ratio < FULL_BOX_RATIO * 1.1:
+            #     # Draw a rectangle around the full box
+            #     box = _get_hp_box_location(x, y, w, h, HP_FULL_HEIGHT, FULL_P1_LOCATION_V if p1 else FULL_P2_LOCATION_V)
+            #     is_hp_box = True
+            elif read_condition_box and ratio > STATUS_BOX_RATIO * 0.9 and ratio < STATUS_BOX_RATIO * 1.1:
                 # Draw a rectangle around the status box
                 box = Rectangle(x, y, x+w, y+h)
-
 
             update = self._get_update_box(input_img, box, bool(p1), is_hp_box)
             if update is not None:

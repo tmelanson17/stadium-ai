@@ -30,9 +30,10 @@ def _get_active_mons(battle_state: BattleState, player_id: PlayerID) -> List[Pok
     Get the list of active Pokémon for the specified player.
     """
     if player_id == PlayerID.P1:
-        return battle_state.player_team.pk_list
+        team = battle_state.player_team
     else:
-        return battle_state.opponent_team.pk_list
+        team = battle_state.opponent_team
+    return [team.pk_list[i] for i in team.in_play]
 
 
 class RandomAgent(Agent):
@@ -48,7 +49,7 @@ class RandomAgent(Agent):
         """
         active_mon = _get_active_mon(battle_state, self.player_id)
         actions = []
-        if not active_mon.status == Status.FAINTED and active_mon.hp > 0:
+        if not active_mon.status == Status.FAINTED or active_mon.hp > 0:
             if active_mon.move1 and _is_available_move(active_mon.move1):
                 actions.append("move 0")
             if active_mon.move2 and _is_available_move(active_mon.move2):
@@ -57,9 +58,10 @@ class RandomAgent(Agent):
                 actions.append("move 2")
             if active_mon.move4 and _is_available_move(active_mon.move4):
                 actions.append("move 3")
-        for i, pokemon in enumerate(_get_active_mons(battle_state, self.player_id)):
-            if pokemon.in_play and pokemon != active_mon and pokemon.hp > 0 and pokemon.status != Status.FAINTED:
-                actions.append(f"switch {i}")
+        else:
+            for i, pokemon in enumerate(_get_active_mons(battle_state, self.player_id)):
+                if pokemon.in_play and pokemon != active_mon and pokemon.hp > 0 and pokemon.status != Status.FAINTED:
+                    actions.append(f"switch {i}")
         if not actions:
             raise ValueError("No valid actions available.")
         return random.choice(actions)

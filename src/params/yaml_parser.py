@@ -77,7 +77,7 @@ def parse_team_from_dict(team_data: List[Dict[str, Any]]) -> TeamState:
         pokemon = parse_pokemon_from_dict(pokemon_data, is_first=(i == 0))
         pokemon_list.append(pokemon)
     
-    return TeamState(pk_list=pokemon_list)
+    return TeamState(pk_list=pokemon_list, in_play=[])
 
 
 def parse_pokemon_from_dict(pokemon_data: Dict[str, Any], is_first: bool = False) -> PokemonState:

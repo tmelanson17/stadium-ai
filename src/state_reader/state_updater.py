@@ -54,6 +54,10 @@ def enact_changes(battle_state: BattleState, changes: Optional[Tuple], opponent:
     # Apply the changes based on the property
     if property_name == "hp":
         target_pokemon.hp = max(0, min(1000, value))
+        if target_pokemon.hp == 0:
+            target_pokemon.status = Status.FAINTED
+        elif target_pokemon.status == Status.FAINTED:
+            target_pokemon.status = Status.NONE
     elif property_name == "status":
         target_pokemon.status = value
     elif property_name == "confused":

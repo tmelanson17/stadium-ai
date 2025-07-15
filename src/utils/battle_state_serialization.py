@@ -71,13 +71,15 @@ class BattleStateSerializer:
     def _serialize_team_state(self, team_state: TeamState) -> Dict[str, Any]:
         """Serialize TeamState to dictionary."""
         return {
-            "pk_list": [self._serialize_pokemon_state(pokemon) for pokemon in team_state.pk_list]
+            "pk_list": [self._serialize_pokemon_state(pokemon) for pokemon in team_state.pk_list],
+            "in_play": team_state.in_play
         }
     
     def _deserialize_team_state(self, data: Dict[str, Any]) -> TeamState:
         """Deserialize dictionary to TeamState."""
         return TeamState(
-            pk_list=[self._deserialize_pokemon_state(pokemon_data) for pokemon_data in data["pk_list"]]
+            pk_list=[self._deserialize_pokemon_state(pokemon_data) for pokemon_data in data["pk_list"]],
+            in_play=data.get("in_play", [])
         )
     
     def _serialize_pokemon_state(self, pokemon: PokemonState) -> Dict[str, Any]:

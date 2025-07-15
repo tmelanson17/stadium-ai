@@ -17,7 +17,7 @@ from src.utils.serialization import deserialize_image_update
 from src.utils.battle_state_serialization import BattleStateSerializer
 from src.rabbitmq.receive import listen
 from src.rabbitmq.send import publish_message_to_topic
-from src.rabbitmq.topics import CONFIG, IMAGE_UPDATE, BATTLE_STATE_UPDATE, CONTROLLER_EXCHANGE
+from src.rabbitmq.topics import CONFIG, IMAGE_UPDATE, TEAM_PREVIEW, IMAGE_EXCHANGE, CONTROLLER_EXCHANGE, BATTLE_STATE_UPDATE
     
 '''
     Wrapper for BattleState to handle updates and locking.
@@ -157,15 +157,36 @@ class StateReader:
         self.handle_update(update)
         # This is assuming the HP update is before a decision needs to be made.
         # TODO: Find another way to handle this.
-        # if update.message_type == MessageType.HP:
-        #     publish_message_to_topic(
-        #         exchange=CONTROLLER_EXCHANGE,
-        #         topic=BATTLE_STATE_UPDATE,
-        #         message=self.serializer.to_dict(self.state.get_state())
-        #     )
+        if update.message_type == MessageType.HP:
+            publish_message_to_topic(
+                exchange=CONTROLLER_EXCHANGE,
+                topic=BATTLE_STATE_UPDATE,
+                message=self.serializer.to_dict(self.state.get_state())
+            )
 
     def handle_camera_config(self, config: Dict[str, str]):
         self.shm = SharedImageList(config, create=False)
+
+    def handle_teampreview(self, config: Dict[str, str]) -> None:
+        '''
+        Handles the team preview command.
+        This is a special case where we need to send the team preview command to the controller.
+        '''
+        if "teampreview" not in config:
+            print("No team preview command found in config.")
+            return
+        indices = config["teampreview"].split()
+        if not indices:
+            print("No indices found in team preview command.")
+            return
+        indices = list(map(int, indices))
+        battle_state = self.state.get_state()
+        if config.get("player_id") == str(PlayerID.P1.value):
+            battle_state.player_team.in_play = indices
+        elif config.get("player_id") == str(PlayerID.P2.value):
+            battle_state.opponent_team.in_play = indices
+        else:
+            raise ValueError(f"Invalid player ID in team preview command: {config.get('player_id')}")
          
 
     def get_state(self) -> BattleState:
@@ -202,6 +223,7 @@ if __name__ == "__main__":
     reader = StateReader(battle_state)
     callbacks = {
         CONFIG: reader.handle_camera_config,
-        IMAGE_UPDATE: reader.handle_update_wrapper        
+        IMAGE_UPDATE: reader.handle_update_wrapper,
+        TEAM_PREVIEW: reader.handle_teampreview,
     }
-    listen("image_data", callbacks)
+    listen(IMAGE_EXCHANGE, callbacks)

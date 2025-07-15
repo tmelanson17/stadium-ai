@@ -10,6 +10,8 @@ import re
 from typing import Dict, List, Optional
 import json
 
+from src.state.gen1_moves import get_move_by_name
+
 
 class PokemonRentalParser:
     """Parser for Pokémon Stadium rental data from Serebii.net"""
@@ -92,7 +94,7 @@ class PokemonRentalParser:
         # Parse the section
         pokemon_info = {
             'number': number,
-            'name': clean_name,
+            'species': clean_name,
             'nickname': clean_name.upper(),
             'level': self._extract_level(section_text),
             'stats': self._extract_stats(section_text),
@@ -128,50 +130,19 @@ class PokemonRentalParser:
     
     def _extract_moves(self, text: str) -> List[str]:
         """Extract moves from Pokemon section text"""
-        # List of known Pokemon moves that appear in the data
-        known_moves = [
-            'Leech Seed', 'Toxic', 'Body Slam', 'Razor Leaf', 'Sleep Powder', 'Growth', 
-            'Double-edge', 'Poisonpowder', 'Solarbeam', 'Take Down', 'Flamethrower', 
-            'Slash', 'Dig', 'Fire Spin', 'Counter', 'Seismic Toss', 'Stun Spore',
-            'Fly', 'Sword Dance', 'Fire Blast', 'Surf', 'Blizzard', 'Strength', 
-            'Rest', 'Ice Beam', 'Hydro Pump', 'Skull Bash', 'Withdraw', 'String Shot',
-            'Tackle', 'Psychic', 'Supersonic', 'Mega Drain', 'Twineedle', 'Hyper Beam',
-            'Focus Energy', 'Quick Attack', 'Sand-attack', 'Mirror Move', 'Super Fang',
-            'Hyper Fang', 'Drill Peck', 'Double Team', 'Fury Attack', 'Swift',
-            'Earthquake', 'Acid', 'Screech', 'Glare', 'Wrap', 'Thunderbolt',
-            'Slam', 'Thunder Wave', 'Thunder', 'Flash', 'Mega Kick', 'Confusion',
-            'Disable', 'Hypnosis', 'Submission', 'Rock Slide', 'Low Kick', 'Reflect',
-            'Dragon Rage', 'Substitute', 'Amnesia', 'Psybeam', 'Metronome', 
-            'Tri Attack', 'Minimize', 'Sing', 'Confuse Ray', 'Tail Whip', 
-            'Petal Dance', 'Spore', 'Solarbeam', 'Horn Drill', 'Rage', 'Thunderpunch',
-            'Mega Punch', 'Fire Punch', 'Ice Punch', 'Lovely Kiss', 'Smokescreen',
-            'Harden', 'Barrier', 'Wing Attack', 'Leer', 'Transform', 'Pin Missile',
-            'Smog', 'Sharpen', 'Conversion', 'Spike Cannon', 'Clamp', 'Dream Eater',
-            'Night Shade', 'Bonemerang', 'Thrash', 'Hi Jump Kick', 'Dizzy Punch',
-            'Crabhammer', 'Guillotine', 'Stomp', 'Explosion', 'Selfdestruct',
-            'Agility', 'Horn Attack', 'Recover', 'Bide', 'Splash', 'Bite', 'Haze',
-            'Bubblebeam', 'Mimic', 'Growl', 'Fury Swipes', 'Lick', 'Sludge',
-            'Aurora Beam', 'Headbutt', 'Egg Bomb', 'Meditate', 'Sky Attack',
-            'Razor Wind', 'Acid Armor', 'Double Kick', 'Poison Sting', 'Cut',
-            'Nigh Shade', 'Exploison'
-        ]
+        lines = [l for l in text.split('\n') if l.strip()]
+        move_lines = lines[-4:]  
+        
         
         moves = []
-        for move in known_moves:
-            if move in text:
+        for move in move_lines:
+            move = move.strip()
+            # Weird edge case with Exploison (Explosion) and Nigh Shade (Night Shade)
+            move = re.sub(r'\bExploison\b', 'Explosion', move, flags=re.IGNORECASE)
+            move = re.sub(r'\bNigh Shade\b', 'Night Shade', move, flags=re.IGNORECASE)
+            if move and get_move_by_name(move):
                 moves.append(move)
-        
-        # Remove duplicates while preserving order and limit to 4 moves
-        unique_moves = []
-        seen = set()
-        for move in moves:
-            if move not in seen:
-                unique_moves.append(move)
-                seen.add(move)
-                if len(unique_moves) >= 4:
-                    break
-        
-        return unique_moves
+        return moves
     
     def get_pokemon_by_number(self, number: str) -> Optional[Dict]:
         """Get a specific Pokemon by its number"""
@@ -189,7 +160,7 @@ class PokemonRentalParser:
             self.parse_pokemon_data()
         
         for pokemon in self.pokemon_data:
-            if pokemon['name'].lower() == name.lower():
+            if pokemon['species'].lower() == name.lower():
                 return pokemon
         return None
     
@@ -216,7 +187,7 @@ class PokemonRentalParser:
         print("-" * 60)
         
         for pokemon in self.pokemon_data:
-            print(f"#{pokemon['number']} {pokemon['name']} (Level {pokemon.get('level', 'Unknown')})")
+            print(f"#{pokemon['number']} {pokemon['species']} (Level {pokemon.get('level', 'Unknown')})")
             if pokemon['stats']:
                 stats_str = ", ".join([f"{k.title()}: {v}" for k, v in pokemon['stats'].items()])
                 print(f"  Stats: {stats_str}")
@@ -251,8 +222,8 @@ def create_team_from_data(pokemon_data: List[Dict]) -> Dict[str, List[Dict]]:
     import random
     if len(pokemon_data) < 6:
         raise ValueError("Not enough Pokemon data available to create a team.")
-    blacklist = ["Ditto", "Caterpie", "Weedle", "Metapod", "Kakuna", "Zubat", "Magikarp"]  # Example blacklist to avoid certain Pokemon
-    pokemon_filtered = [p for p in pokemon_data if p['name'] not in blacklist]
+    blacklist = ["Ditto", "Caterpie", "Weedle", "Metapod", "Kakuna", "Zubat", "Magikarp", "E"]  # Example blacklist to avoid certain Pokemon
+    pokemon_filtered = [p for p in pokemon_data if p['species'] not in blacklist]
 
     # Randomly select 6 unique Pokemon
     selected_pokemon1 = random.sample(pokemon_filtered, 6)
@@ -302,7 +273,7 @@ def main():
         for team in ["Team 1", "Team 2"]:
             print(f"\n{team}:")
             for pokemon in team_data[team]:
-                print(f"#{pokemon['number']} {pokemon['name']} (Level {pokemon.get('level', 'Unknown')})")
+                print(f"#{pokemon['number']} {pokemon['species']} (Level {pokemon.get('level', 'Unknown')})")
                 if pokemon['stats']:
                     stats_str = ", ".join([f"{k.title()}: {v}" for k, v in pokemon['stats'].items()])
                     print(f"  Stats: {stats_str}")

@@ -45,14 +45,14 @@ class StadiumModeParser:
             mode = StadiumMode.EXECUTE
         else:
             for update in box_updates:
-                img_h, _, _ = update.image.shape
+                img_h, img_w, _ = update.image.shape
                 # Check if the update is an HP MessageType and P2
                 if update.message_type == MessageType.HP and update.player_id == PlayerID.P2:
-                    if update.roi.y1 < img_h / 2:
+                    if update.roi.y1 < img_h / 2 and update.roi.x1 > img_w / 2:
                         # If on the top half of the screen, it's the Execute mode
                         mode = StadiumMode.EXECUTE
                         break
-                    else:
+                    elif update.roi.y1 >= img_h / 2 and update.roi.x1 > img_w / 2:
                         # If on the bottom half of the screen, it's the Choose Move mode
                         mode = StadiumMode.CHOOSE_MOVE
                         break

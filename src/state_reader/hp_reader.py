@@ -8,7 +8,8 @@ from src.state_reader.tesseract import preprocess_for_ocr, remove_large_contours
 # Portions of screen
 POKEMON_NAME = (0, 0.4)
 STATUS = ((0.38, 0.65), (0.4, 1.0))
-HP = ((0.1, 0.5), (0.75, 0.95))
+# HP = ((0.1, 0.5), (0.75, 0.95))
+HP = ((0.1, 0.5), (0.75, 1.0))
 SIMILARITY_THRESHOLD = 0.2
 NUMBERS = [
     cv2.imread(f"numbers/processed_{i}.jpg", cv2.IMREAD_GRAYSCALE)

@@ -7,11 +7,11 @@ from multiprocessing import shared_memory
 from src.display.draw import draw_updates, draw_mode
 from src.params.yaml_parser import load_battle_state_from_yaml
 from src.rabbitmq.send import publish_message_to_topic
-from src.rabbitmq.topics import IMAGE_UPDATE, CONFIG
+from src.rabbitmq.topics import IMAGE_EXCHANGE, IMAGE_UPDATE, CONFIG
 from src.screen_parsing.box_detection import BoxDetection
 from src.screen_parsing.stadium_mode import StadiumModeParser
 from src.screen_parsing.update_processor import UpdateProcessor
-from src.state.pokestate_defs import ImageUpdate
+from src.state.pokestate_defs import ImageUpdate, PlayerID, StadiumMode
 from src.utils.shared_image_list import SharedImageList
 from src.utils.serialization import serialize_image_update
 
@@ -23,6 +23,7 @@ def parse_args():
     # TODO: Add debug mode
     parser.add_argument('--debug', action='store_true', help='Enable debug mode [NOT IMPLEMENTED]')
     parser.add_argument('--n-shmem-frames', type=int, default=20, help='Number of frames to keep in shared memory')
+    parser.add_argument('--skip-teampreview', action='store_true', help='Skip sending team preview command')
     return parser.parse_args()
 
 
@@ -35,19 +36,21 @@ def handle_teampreview_command():
     """
     Send Team Preview data over to the controller.
     For now, the team preview will be a random list of indices.
+    Also assume that we are controlling P2
     """
     from src.rabbitmq.topics import CONTROLLER_EXCHANGE, TEAM_PREVIEW
     # Choose 3 from range(6) for a team preview
     indices = np.random.choice(range(6), 3, replace=False)
-    teampreview = " ".join(map(str, indices)) + " 4" # 4 is the index for the "Ready" command (A)
-    command = {"teampreview": teampreview}
+    teampreview = " ".join(map(str, indices))
+    command = {"teampreview": teampreview, "player_id": str(PlayerID.P2.value)}
     print(f"Sending Team Preview command: {command}")
     publish_message_to_topic(CONTROLLER_EXCHANGE, TEAM_PREVIEW, command)
+    publish_message_to_topic(IMAGE_EXCHANGE, TEAM_PREVIEW, command)
 
 def main(args):
     # Load video capture from file or camera
     if args.camera:
-        cap = cv2.VideoCapture(0)  # Use 0 for the default camera
+        cap = cv2.VideoCapture(2)  # Use 0 for the default camera
     else:
         image_path = args.image_path
         cap = cv2.VideoCapture(image_path)
@@ -65,28 +68,44 @@ def main(args):
     
     camera_config = {
         'name': "video_frames",
-        'width': str(initial_frame.shape[1]),
-        'height': str(initial_frame.shape[0]),
+        'width': str(1280), #initial_frame.shape[1]),
+        'height': str(720), # initial_frame.shape[0]),
         'channel': str(initial_frame.shape[2]),
         'dtype': str(initial_frame.dtype),
         'n_shmem_frames': str(args.n_shmem_frames),
     }
     shm = SharedImageList(camera_config=camera_config, create=True)
-    publish_message_to_topic('image_data', CONFIG, camera_config)
-    handle_teampreview_command()
+    publish_message_to_topic(IMAGE_EXCHANGE, CONFIG, camera_config)
+    if not args.skip_teampreview:
+        handle_teampreview_command()
+    else:
+        print("Skipping team preview command.")
+        stadium_mode_parser.prev_mode = StadiumMode.EXECUTE  # Start in Execute mode
+        
     idx=0
 
     # Read a frame from the video source
     while True:
-        ret, frame = cap.read()
+        ret, frame_small = cap.read()
+        if frame_small is None or not frame_small.size:
+            continue
+        frame = cv2.resize(frame_small, (1280, 720))  # Resize for consistency
         if not ret:
             print("Exiting...")
             break
-        if not stadium_mode_parser.check_battle_begin(frame):
+        if not args.skip_teampreview and not stadium_mode_parser.check_battle_begin(frame):
             print("Battle has not begun yet, skipping frame.")
             continue
+        # contours, negative_edges = box_detection._detect_contours(frame)
+        # cv2.drawContours(frame, contours, -1, (0, 255, 0), 2)  # Draw contours for debugging
+        # cv2.imshow("Contours", frame)
+        # cv2.imshow("Negative Edges", negative_edges)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     print("Exiting...")
+        #     break
+        # continue
 
-        updates = box_detection.update(frame)
+        updates = box_detection.update(frame, stadium_mode_parser.prev_mode == StadiumMode.EXECUTE)
         stadium_mode = stadium_mode_parser.parse(updates)
         if stadium_mode is not None:
             update_processor.update_mode(stadium_mode)
@@ -94,7 +113,7 @@ def main(args):
         for update in processed_updates:
             if isinstance(update, ImageUpdate):
                 # Add the update to the queue for processing
-                publish_message_to_topic('image_data', IMAGE_UPDATE, serialize_image_update(update, shm))
+                publish_message_to_topic(IMAGE_EXCHANGE, IMAGE_UPDATE, serialize_image_update(update, shm))
                 # print(f"Published ImageUpdate: {update.message_type} for player {update.player_id}")
             else:
                 print(f"Unexpected update type: {type(update)}")

@@ -44,6 +44,7 @@ if __name__ == "__main__":
     import argparse
     from src.controller.serial_controller import SerialController
     from src.controller.random_agent import RandomAgent
+    from src.state.pokestate_defs import PlayerID
 
     parser = argparse.ArgumentParser(description="Controller Node")
     parser.add_argument("--port", type=str, help="Serial port to connect to")
@@ -57,5 +58,5 @@ if __name__ == "__main__":
         if not args.port:
             raise ValueError("Port must be specified when using serial controller.")
         controller = SerialController(port=args.port, baudrate=args.baudrate)
-    agent = RandomAgent()  # TODO: Replace with actual agent implementation
+    agent = RandomAgent(player_id=PlayerID.P2)  # TODO: Replace with actual agent implementation
     service = OutputControlService(controller, agent)

@@ -24,23 +24,28 @@ class Messages(Enum):
     TRAPPED = "It can't move!"  
     REGAINED_HEALTH = "It regained health!"
     FAINTED = "OK! Come back!"
+    SEEDED = "It was seeded!" # TODO: This is the leech seed effect, but not sure how to handle it.
     
     # Actor effect messages
     FLEW_UP_HIGH = "It flew up high!"
     CONFUSED = "It's confused!"
     NO_LONGER_CONFUSED = "It's no longer confused!"
     FULLY_PARALYZED = "It's fully paralyzed!"
+    PARALYZED = "It's paralyzed! It may not attack!"
     FAST_ASLEEP = "It's fast asleep!"
     FELL_ASLEEP_HEALED = "It fell asleep and was healed!"
     GAINED_ARMOR = "It gained armor!"
     PROTECTED_SPECIAL = "It's protected from SPECIAL attacks!"
     WOKE_UP = "It woke up!"
+    HURT_BY_POISON = "It's hurt by poison!"
+    HURT_BY_BURN = "It's hurt by burn!"
     
     # Receiver effect messages
     WAS_BURNED = "It was burned!"
     FROZEN_SOLID = "It was frozen solid!"
     BECAME_CONFUSED = "It became confused!"
     BADLY_POISONED = "It's badly poisoned!"
+    POISONED = "It was poisoned!"
     FELL_ASLEEP = "It fell asleep!"
     MAY_NOT_ATTACK = "It may not attack!"
     
@@ -75,7 +80,8 @@ no_effect_messages = [
     Messages.ATTACKED_ITSELF.value,
     Messages.SUCKED_HP.value,
     Messages.FAILED.value,
-    Messages.REGAINED_HEALTH.value
+    Messages.REGAINED_HEALTH.value,
+    Messages.SEEDED.value,
 ]
 
 actor_effect_messages = {
@@ -87,14 +93,18 @@ actor_effect_messages = {
     Messages.FELL_ASLEEP_HEALED.value: ("actor", "status", Status.SLEEP),
     Messages.GAINED_ARMOR.value: ("actor", "reflect", True),
     Messages.PROTECTED_SPECIAL.value: ("actor", "light_screen", True),
-    Messages.WOKE_UP.value: ("actor", "status", Status.NONE)
+    Messages.WOKE_UP.value: ("actor", "status", Status.NONE),
+    Messages.HURT_BY_POISON.value: ("actor", "status", Status.POISONED),
+    Messages.HURT_BY_BURN.value: ("actor", "status", Status.BURNED),
 }
 
 receiver_effect_messages = {
     Messages.WAS_BURNED.value: ("receiver", "status", Status.BURNED),
+    Messages.PARALYZED.value: ("receiver", "status", Status.PARALYZED),
     Messages.FROZEN_SOLID.value: ("receiver", "status", Status.FROZEN),
     Messages.BECAME_CONFUSED.value: ("receiver", "confused", True),
     Messages.BADLY_POISONED.value: ("receiver", "status", Status.POISONED),
+    Messages.POISONED.value: ("receiver", "status", Status.POISONED),
     Messages.FELL_ASLEEP.value: ("receiver", "status", Status.SLEEP),
     Messages.MAY_NOT_ATTACK.value: ("receiver", "status", Status.PARALYZED),
     Messages.TRAPPED.value: ("receiver", "trapped", True),

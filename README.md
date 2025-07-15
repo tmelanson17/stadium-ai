@@ -86,9 +86,12 @@ This will install:
 ## Known Bugs
 
 - **Partial Trapping Moves**: Partial trapping moves (like Bind, Fire Spin, etc.) are automatically assumed to be successful by the state_reader, which is not always the case. In actual gameplay, these moves can miss or fail to trap the opponent, but the current implementation assumes they always succeed when detected.
-- **Adjust ContinuousTask speed**: Right now, it operates a little slowly.
 - **Incomplete Battle Information**: Current battle state has full information. Need a way to pass incomplete information to RL agent, since opponent's moves/mons are not known at the start of the battle.
 - **Team Preview Mode**: Currently Battle State receives Pokemon directly from team specs. Needs to handle the Team Preview stage where the three pokemon are chosen.
+- **Order may not be kept** Team preview button order might not be in the same as the order for choosing pokemon.
+- **Accuracy is not tracked** Need to add accuracy boosts/debuffs
+- **HP %/Raw mismatch** Should be %, but haven't incorporated max HP values in battle state yet.
+- **Tracking should find most accurate in frame before adding to average filter**
 
 ## Project Structure
 

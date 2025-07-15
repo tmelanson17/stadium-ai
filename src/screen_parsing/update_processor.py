@@ -48,9 +48,9 @@ class UpdateProcessor:
         if self.mode == StadiumMode.CHOOSE_MOVE:
             for update in updates:
                 if update and update.message_type == MessageType.HP:
-                    if update.player_id == PlayerID.P1 and self.hp1_update is None:
+                    if update.player_id == PlayerID.P1:
                         self.hp1_update = update
-                    elif update.player_id == PlayerID.P2 and self.hp2_update is None:
+                    elif update.player_id == PlayerID.P2:
                         self.hp2_update = update
             if self.hp1_update and self.hp2_update and not self.done:
                 # Return both HP updates if both are available

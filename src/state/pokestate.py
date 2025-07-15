@@ -231,7 +231,11 @@ class PokemonState:
 
 @dataclass
 class TeamState:
+    # List of Pokemon brought to the battle
     pk_list: List[PokemonState]
+
+    # List of indices of Pokemon chosen in team preview, in the order they were selected
+    in_play: List[int] 
 
     def insert_numpy(self, result: np.ndarray, start_idx: int = 0):
         for i, pk in enumerate(self.pk_list):
@@ -338,8 +342,8 @@ def create_default_battle_state() -> BattleState:
     return BattleState(
         player_active_mon=0,
         opponent_active_mon=0,
-        player_team=TeamState(pk_list=[PokemonState() for _ in range(6)]),
-        opponent_team=TeamState(pk_list=[PokemonState() for _ in range(6)])
+        player_team=TeamState(in_play=[], pk_list=[PokemonState() for _ in range(6)]),
+        opponent_team=TeamState(in_play=[], pk_list=[PokemonState() for _ in range(6)])
     )
 
 def print_battle_state(battle_state: BattleState, title: str = "Battle State") -> None:
