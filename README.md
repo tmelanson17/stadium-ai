@@ -92,6 +92,10 @@ This will install:
 - **Accuracy is not tracked** Need to add accuracy boosts/debuffs
 - **HP %/Raw mismatch** Should be %, but haven't incorporated max HP values in battle state yet.
 - **Tracking should find most accurate in frame before adding to average filter**
+- **Moves should decrement PP** 
+- **Moves should set certain effects**:
+   - Two-turn moves should deactivate two-turn status
+
 
 ## Project Structure
 
