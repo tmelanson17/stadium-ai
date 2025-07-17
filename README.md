@@ -56,32 +56,27 @@ This will install:
 
 ### Basic Usage
 
-1. **Damage Calculator**:
-   ```bash
-   npm test
-   # or
-   node query_calc.js
-   ```
+1. Camera reading and box parsing
 
-2. **Move Query**:
-   ```bash
-   node query_movedex.js
-   ```
+```bash
+ python .\main.py --camera=0
+```
 
-3. **Game State Reader**:
-   ```bash
-   python game_state_machine.py
-   ```
+2. Parsing and battle state update
 
-### Example Usage
+```bash
+python -m src.state_reader.state_reader --config .\config\pokemon_rental_teams.yaml
+```
 
-**TODO**
+3. Setting up the Serial controller
+
+```bash
+python -m src.controller.controller_node  --port COM4
+```
 
 ### Configuration
 
-- Pokemon data: `config/pokemon.yaml`
-- Move data: `config/moves/`
-- Type effectiveness: `analysis/type_chart.csv`
+**TODO**
 
 ## Known Bugs
 
@@ -96,22 +91,25 @@ This will install:
    - Two-turn moves should deactivate two-turn status
 - **Pokemon should be read from HP box, not from conditions** Condition messages are too volatile
 - **BattleState corruption** Occasionally, the stats for the benched Pokemon are updated instead of the active one. Could be related to the bug above.
-
+- **Separate finding possible moves from the RandomAgent** 
+- **Debug UI only updates after state updates** (due to lack of understanding of multithreading in Python)
 
 ## Project Structure
 
-**TODO** : This will be restructured into the RL, StadiumParser, and DeepLearning repositories, and configs will be changed 
-
 ```
-├── ai/                 # AI decision making logic
-├── analysis/           # Damage calculation and type effectiveness (DEPRECATED)
-├── config/             # Pokemon and move configurations 
-├── cv/                 # Computer vision and OCR components (DEPRECATED)
-├── parse/              # Game state parsing (DEPRECATED)
+├── examples/           # Examples for running modules in isolation.
 ├── src/                # Core source code
-├── state/              # Game state management
+   |── concurrent       # Not used
+   |── controller       # Code that handles the agent + output to serial
+   |── display          # Utils for displaying state + updates
+   |── params           # Handles parameter loading (usually from YAML)
+   |── rabbitmq         # RabbitMQ wrapper code.
+   |── screen_parsing   # Detects the boxes and Stadium mode
+   |── state            # Holds BattleState, convenience enums / typedefs
+   |── state_reader     # Text parsing + state update
+   |── utils            # Misc. utils
+├── config/             # Pokemon and move configurations 
 ├── test/               # Test files
-└── third-party/        # External dependencies
 ```
 
 ## Contributing
