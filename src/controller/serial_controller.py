@@ -43,6 +43,10 @@ class SerialController(Controller):
         
         # Initialize serial connection here (omitted for brevity)
     
+    def __delattr__(self, name: str) -> None:
+        self.serial_connection.close()
+        return super().__delattr__(name)
+    
     def serial_write(self, data: str) -> None:
         """
         Write data to the serial port.
@@ -51,9 +55,10 @@ class SerialController(Controller):
             data: The data string to write to the serial port
         """
         self.serial_connection.write(data.encode('utf-8'))
+        print(f"Sent: {data.encode('utf-8')}")
         self.serial_connection.flush()
-        time.sleep(0.5)  # Wait for the controller to process the command
-        print(self.serial_connection.read(1))  # Read response from controller
+        time.sleep(0.2)  # Wait for the controller to process the command
+        print(self.serial_connection.read_all())  # Read response from controller
     
     def send_command(self, command: str) -> None:
         """
@@ -80,8 +85,7 @@ class SerialController(Controller):
         if not index.isdigit() or int(index) < 0:
             raise ValueError("Index must be a non-negative integer.")
         controller_action = "B" if action == "switch" else "A"
-        self.serial_write(controller_action)
-        self.serial_write(_CHARACTER_MAP[int(index)])
+        self.serial_write(controller_action + _CHARACTER_MAP[int(index)])
 
 if __name__ == "__main__":
     import argparse
