@@ -87,7 +87,6 @@ This will install:
 
 - **Partial Trapping Moves**: Partial trapping moves (like Bind, Fire Spin, etc.) are automatically assumed to be successful by the state_reader, which is not always the case. In actual gameplay, these moves can miss or fail to trap the opponent, but the current implementation assumes they always succeed when detected.
 - **Incomplete Battle Information**: Current battle state has full information. Need a way to pass incomplete information to RL agent, since opponent's moves/mons are not known at the start of the battle.
-- **Team Preview Mode**: Currently Battle State receives Pokemon directly from team specs. Needs to handle the Team Preview stage where the three pokemon are chosen.
 - **Order may not be kept** Team preview button order might not be in the same as the order for choosing pokemon.
 - **Accuracy is not tracked** Need to add accuracy boosts/debuffs
 - **HP %/Raw mismatch** Should be %, but haven't incorporated max HP values in battle state yet.
@@ -95,6 +94,8 @@ This will install:
 - **Moves should decrement PP** 
 - **Moves should set certain effects**:
    - Two-turn moves should deactivate two-turn status
+- **Pokemon should be read from HP box, not from conditions** Condition messages are too volatile
+- **BattleState corruption** Occasionally, the stats for the benched Pokemon are updated instead of the active one. Could be related to the bug above.
 
 
 ## Project Structure

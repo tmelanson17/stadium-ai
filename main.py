@@ -19,7 +19,7 @@ def parse_args():
     parser = ArgumentParser(description="Run on input video feed and monitor game state.")
     parser.add_argument('--image_path', type=str, help='Path to the image file')
     # Add option to play from camera
-    parser.add_argument('--camera', action='store_true', help='Use camera input instead of image file')
+    parser.add_argument('--camera', type=int, help='Camera index to use (default: 0)', default=None)
     # TODO: Add debug mode
     parser.add_argument('--debug', action='store_true', help='Enable debug mode [NOT IMPLEMENTED]')
     parser.add_argument('--n-shmem-frames', type=int, default=20, help='Number of frames to keep in shared memory')
@@ -28,7 +28,7 @@ def parse_args():
 
 
 def check_args(args):
-    if not args.image_path and not args.camera:
+    if not args.image_path and args.camera is None:
         raise ValueError("Either image path or camera option must be provided.")
 
 
@@ -49,8 +49,8 @@ def handle_teampreview_command():
 
 def main(args):
     # Load video capture from file or camera
-    if args.camera:
-        cap = cv2.VideoCapture(2)  # Use 0 for the default camera
+    if args.camera is not None:
+        cap = cv2.VideoCapture(args.camera)
     else:
         image_path = args.image_path
         cap = cv2.VideoCapture(image_path)
