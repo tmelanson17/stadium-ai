@@ -93,6 +93,7 @@ python -m src.controller.controller_node  --port COM4
 - **BattleState corruption** Occasionally, the stats for the benched Pokemon are updated instead of the active one. Could be related to the bug above.
 - **Separate finding possible moves from the RandomAgent** 
 - **Debug UI only updates after state updates** (due to lack of understanding of multithreading in Python)
+- **8 and 9 template images are corrupted** This results in weird behavior when at ex. 88 hp
 
 ## Project Structure
 
