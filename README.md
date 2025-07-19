@@ -7,8 +7,11 @@ An AI system for Pokemon Stadium that can read game state from screen capture an
 - **Computer Vision**: Reads game state from Pokemon Stadium screenshots/video
 - **State Management**: Tracks Pokemon stats, HP, status conditions, and battle state
 - **Damage Calculation**: Uses Smogon damage calculator for accurate move damage prediction
-- **AI Decision Making**: Chooses optimal moves based on game state analysis
 - **Move Database**: Comprehensive move and Pokemon data configuration
+
+## Diagram
+
+![alt text](stadium_diagram.png)
 
 ## Install
 
