@@ -11,7 +11,7 @@ An AI system for Pokemon Stadium that can read game state from screen capture an
 
 ## Diagram
 
-![alt text](stadium_diagram.png)
+<img src="stadium_diagram.png">
 
 ## Install
 
