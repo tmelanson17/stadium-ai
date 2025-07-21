@@ -15,7 +15,7 @@ def create_example_battle_state(
     player_pokemon = PokemonState(
         active=True,
         known=True,
-        name=active_p1_name if active_p1_name else "Pikachu",
+        name=active_p1_name if active_p1_name else "PIKACHU",
         species="Pikachu",
         type1="Electric",
         hp=85.0,
@@ -26,7 +26,7 @@ def create_example_battle_state(
     opponent_pokemon = PokemonState(
         active=True,
         known=True,
-        name=active_p2_name if active_p2_name else "Charmander",
+        name=active_p2_name if active_p2_name else "CHARMANDER",
         species="Charmander",
         type1="Fire",
         hp=90.0,
@@ -43,8 +43,8 @@ def create_example_battle_state(
     )
     
     # Create teams
-    player_team = TeamState(pk_list=[player_pokemon] + [PokemonState() for _ in range(5)])
-    opponent_team = TeamState(pk_list=[opponent_pokemon, opponent_bench_pokemon] + [PokemonState() for _ in range(5)])
+    player_team = TeamState(pk_list=[player_pokemon] + [PokemonState() for _ in range(5)], in_play=[0])
+    opponent_team = TeamState(pk_list=[opponent_pokemon, opponent_bench_pokemon] + [PokemonState() for _ in range(5)], in_play=[0, 1])
     
     return BattleState(
         player_active_mon=0,

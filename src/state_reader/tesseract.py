@@ -79,7 +79,7 @@ def read_text_from_roi(
         return []
 
 
-def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False) -> np.ndarray:
+def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False, blur_kernel: int = 3) -> np.ndarray:
     """
     Preprocess image to improve OCR accuracy.
     
@@ -105,7 +105,7 @@ def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False) -> np.ndarray:
     )
     
     # # Apply Gaussian blur to reduce noise
-    blurred = cv2.GaussianBlur(resized, (3, 3), 0)
+    blurred = cv2.GaussianBlur(resized, (blur_kernel, blur_kernel), 0)
     # Skip blurring for now, as it may not be necessary
     # blurred = resized
     

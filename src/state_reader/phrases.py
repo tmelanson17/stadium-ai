@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple, Any, Dict, Optional
+from typing import Tuple, Any, Dict, Optional, List
 from rapidfuzz import process, fuzz
 
 from src.state.pokestate_defs import Status
@@ -185,3 +185,36 @@ def parse_update_message(message: str, battle_state: BattleState, opponent: bool
     match, _, _ = result
     
     return message_map.get(match, None)
+
+def get_closest_pokemon_name(messages: List[str], battle_state: BattleState, opponent: bool = True) -> Optional[str]:
+    """
+    Get the closest matching Pokemon name from the messages.
+    
+    Args:
+        messages: List of messages to match against
+        battle_state: Current battle state containing Pokemon information
+    
+    Returns:
+        Tuple of closest matching Pokemon name for player, or None if no match found.
+    """
+    if opponent:
+        target_pokemon = [mon.name for mon in battle_state.opponent_team.pk_list]
+    else:
+        target_pokemon = [mon.name for mon in battle_state.player_team.pk_list]
+
+    max_similarity = 0
+    argmax_similarity = None
+    for msg in messages:
+        if msg is None or len(msg) == 0:
+            continue
+        result = process.extractOne(msg, target_pokemon, scorer=fuzz.ratio, score_cutoff=70)
+        if result is None:
+            continue
+        match, similarity, _ = result
+        if match.strip() == msg.strip():
+            return match.strip()
+        if similarity > max_similarity:
+            max_similarity = similarity
+            argmax_similarity = match.strip()
+
+    return argmax_similarity

@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
 
-from typing import Tuple, TypeAlias, List
+from typing import Tuple, TypeAlias, List, Optional
 # TODO: Move preprocessing functions to a common module
-from src.state_reader.tesseract import preprocess_for_ocr, remove_large_contours
+from src.state_reader.tesseract import preprocess_for_ocr, remove_large_contours, read_text_from_roi
+from src.state_reader.phrases import get_closest_pokemon_name 
+from src.state.pokestate import BattleState
 
 # Portions of screen
 POKEMON_NAME = (0, 0.4)
@@ -17,6 +19,7 @@ NUMBERS = [
 ]
 
 # HP_TESSERACT_CONFIG="--oem 1 --psm 13 -l eng --user-patterns patterns/hp.pattern -c tessedit_char_whitelist=0123456789"
+NAME_TESSERACT_CONFIG="--oem 1 --psm 13 -l eng -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 # TODO : Move this to a more central location, as this is used often.
 BBox: TypeAlias = Tuple[Tuple[int, int], Tuple[int, int]]
@@ -95,3 +98,36 @@ def get_hp(image: np.ndarray, roi: BBox) -> int:
     if len(hp_string) == 0:
         return -1
     return int(hp_string)
+
+name_i = 0
+def get_pokemon_name(image: np.ndarray, roi: BBox, battle_state: BattleState, opponent: bool = False) -> Optional[str]:
+    """
+    Extract the Pokemon name from the specified region of interest (ROI).
+
+    Args:
+        image: Input image as a numpy array.
+        roi: Region of interest as a bounding box ((x1, y1), (x2, y2)).
+
+    Returns:
+        Extracted Pokemon name as a string.
+    """
+    global name_i
+    (x1, y1), (x2, y2) = roi
+    # Adjust the ROI to focus on the Pokemon name section
+    y1 += int(POKEMON_NAME[0] * (y2 - y1))
+    y2 -= int((1 - POKEMON_NAME[1]) * (y2 - y1))
+    preprocess = preprocess_for_ocr(image[y1:y2, x1:x2], use_otsu=True, blur_kernel=1)
+    cv2.imwrite(f"debug/pokemon_name_section_{name_i}.png", image[y1:y2, x1:x2])
+
+    names = read_text_from_roi(
+        image, roi=((x1, y1), (x2, y2)),
+        tesseract_config=NAME_TESSERACT_CONFIG,
+        preprocess=False
+    )
+    names = [name.strip() for name in names if name is not None and len(name.strip()) > 0]
+    if not names:
+        return None
+
+    # Get the closest matching Pokemon name from the messages
+    closest_name = get_closest_pokemon_name(names, battle_state, opponent)
+    return closest_name
