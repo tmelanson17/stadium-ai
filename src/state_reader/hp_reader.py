@@ -86,8 +86,8 @@ def get_hp(image: np.ndarray, roi: BBox) -> int:
     """
     global i
     ((x1, y1), (x2, y2)) = get_hp_section(roi)
-    preprocessed = preprocess_for_ocr(image[y1:y2, x1:x2], resize_scale=4, use_otsu=True, blur_kernel=5, morph_kernel=1)
-    denoised = remove_large_contours(preprocessed, min_area=10, min_aspect_ratio=0.2)
+    preprocessed = preprocess_for_ocr(image[y1:y2, x1:x2], resize_scale=8, use_otsu=True, blur_kernel=3, morph_kernel=1)
+    denoised = remove_large_contours(preprocessed, min_area=400, min_aspect_ratio=0.2)
     cv2.imwrite(f"debug/hp_section_{i}.png", image[y1:y2, x1:x2])
     cv2.imwrite(f"debug/hp_section_denoised_{i}.png", denoised)
     i+=1
