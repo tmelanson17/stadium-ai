@@ -97,6 +97,7 @@ python -m src.controller.controller_node  --port COM4
 - **Separate finding possible moves from the RandomAgent** 
 - **Debug UI only updates after state updates** (due to lack of understanding of multithreading in Python)
 - **8 and 9 template images are corrupted** This results in weird behavior when at ex. 88 hp
+- **HP outlier rejection / filtering** Currently, only the first HP result is recorded. Should attempt multiple recordings, and get the best guess from there.
 
 ## Project Structure
 

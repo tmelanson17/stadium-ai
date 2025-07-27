@@ -73,12 +73,9 @@ def enact_changes(battle_state: BattleState, changes: Optional[Tuple], opponent:
     elif property_name == "switch":
         # Handle Pokemon switching
         if target == "actor":
-            if opponent:
-                battle_state.opponent_active_mon = value
-            else:
-                battle_state.player_active_mon = value
+            handle_pokemon_switch(battle_state, value, is_opponent=opponent)
         else:
-            print(f"Warning: Switch target '{target}' not supported")
+            raise ValueError(f"Invalid switch target: {target}")
     elif property_name in ["attack_boost", "defense_boost", "special_boost", "speed_boost"]:
         # Handle stat boosts
         if property_name == "attack_boost":
@@ -90,7 +87,7 @@ def enact_changes(battle_state: BattleState, changes: Optional[Tuple], opponent:
         elif property_name == "speed_boost":
             target_pokemon.speed_boost = max(-6, min(6, target_pokemon.speed_boost + value))
     else:
-        print(f"Warning: Unknown property '{property_name}' in changes")
+        raise ValueError(f"Unknown property '{property_name}' in changes")
 
 
 def apply_haze_effect(battle_state: BattleState) -> None:
@@ -126,19 +123,30 @@ def handle_pokemon_switch(battle_state: BattleState, new_index: int, is_opponent
         new_index: Index of the Pokemon to switch to
         is_opponent: Whether this is an opponent switch (True) or player switch (False)
     """
+    if new_index < 0 or new_index >= len(battle_state.player_team.pk_list):
+        print(f"Invalid Pokemon index {new_index} for switch.")
+        return
+
+    current_pokemon = None
     if is_opponent:
+        if new_index == battle_state.opponent_active_mon:
+            print("Switching to the same Pokemon, no action taken.")
+            return
         # Reset volatile conditions of the current Pokemon
         current_pokemon = battle_state.opponent_team.pk_list[battle_state.opponent_active_mon]
-        reset_volatile_conditions(current_pokemon)
-        
-        # Switch to new Pokemon
-        battle_state.opponent_active_mon = new_index
     else:
+        if new_index == battle_state.player_active_mon:
+            print("Switching to the same Pokemon, no action taken.")
+            return
         # Reset volatile conditions of the current Pokemon
         current_pokemon = battle_state.player_team.pk_list[battle_state.player_active_mon]
-        reset_volatile_conditions(current_pokemon)
+
+    reset_volatile_conditions(current_pokemon)
         
-        # Switch to new Pokemon
+    # Switch to new Pokemon
+    if is_opponent: 
+        battle_state.opponent_active_mon = new_index
+    else:
         battle_state.player_active_mon = new_index
 
 

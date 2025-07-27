@@ -5,7 +5,7 @@ import os
 
 from src.state_reader.state_reader import (
     PlayerID,
-    UpdateQueue
+    StateReader
 )
 from src.state.pokestate_defs import (
     MessageType,
@@ -18,13 +18,13 @@ from src.state.pokestate import (
 from test.state_reader.test_utils import create_example_battle_state
 
 async def main():
-    battle_state = create_example_battle_state(active_p1_name="BULBY")
+    battle_state = create_example_battle_state(active_p1_name="BULBY", active_p2_name="GENGAR")
     battle_state.player_team.pk_list[battle_state.player_active_mon].confused = False
     top_dir = os.getcwd()
     battle_state.player_team.pk_list[battle_state.player_active_mon].hp = 100
     battle_state.opponent_team.pk_list[battle_state.opponent_active_mon].hp = 100
 
-    queue = UpdateQueue(battle_state)
+    queue = StateReader(battle_state)
     STATUS_ROI = Rectangle(76, 230, 406, 296)  # Status condition area
     P1_HP = Rectangle(30, 20, 138, 78)
     P2_HP = Rectangle(340, 20, 448, 78)
@@ -42,18 +42,18 @@ async def main():
             message_type=MessageType.CONDITION,
             player_id=id
         )
-        await queue.put(input_update_condition)
+        queue.handle_update(input_update_condition)
         input_update_health = ImageUpdate(
             image=image,
             roi=P1_HP if id == PlayerID.P1 else P2_HP,
             message_type=MessageType.HP,
             player_id=id
         )
-        await queue.put(input_update_health)
+        queue.handle_update(input_update_health)
         i += 1
 
     print("All updates have been put into the queue.")
-    state = await queue.get_state()
+    state = queue.get_state()
     assert isinstance(state, BattleState), "Expected BattleState instance"
     # Check that active pokemon is confused
     # TODO: Make a utility function for getting the active mon
@@ -64,10 +64,8 @@ async def main():
     print(f"P1: {p1_mon.hp}")
     print(f"P2: {p2_mon.hp}")
     assert p1_mon.hp != 100, "Health was not updated"
-    
-
-    await queue.close()
-    assert queue.queue.empty(), "Queue should be closed and empty"
+    print("P1 active mon name (expect BULBY):", p1_mon.name)
+    print("P2 active mon name (expect GENGAR):", p2_mon.name)
 
 
 if __name__ == "__main__":

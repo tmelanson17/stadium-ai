@@ -79,13 +79,16 @@ def read_text_from_roi(
         return []
 
 
-def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False, blur_kernel: int = 3) -> np.ndarray:
+def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False, resize_scale=2, blur_kernel: int = 3, morph_kernel: int = 3) -> np.ndarray:
     """
     Preprocess image to improve OCR accuracy.
     
     Args:
         image: Input image
-        
+        resize_scale: Scale factor for resizing the image
+        blur_kernel: Kernel size for Gaussian blur
+        morph_kernel: Kernel size for morphological operations
+
     Returns:
         Preprocessed image
     """
@@ -94,18 +97,23 @@ def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False, blur_kernel: i
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     else:
         gray = image.copy()
+
+    # Normalize the image to account for lighting variations + ensure 0-255 range
+    normalized = cv2.normalize(gray, None, 0, 255, cv2.NORM_MINMAX)
     
     
     # Scale up the image for better OCR (Tesseract works better on larger text)
-    scale_factor = 2
-    height, width = gray.shape
+    height, width = normalized.shape
     resized = cv2.resize(
-        gray, 
-        (width * scale_factor, height * scale_factor), 
+        normalized,
+        (width * resize_scale, height * resize_scale),
     )
     
-    # # Apply Gaussian blur to reduce noise
-    blurred = cv2.GaussianBlur(resized, (blur_kernel, blur_kernel), 0)
+    # Apply Gaussian blur to reduce noise
+    if blur_kernel > 1:
+        blurred = cv2.GaussianBlur(resized, (blur_kernel, blur_kernel), 0)
+    else:
+        blurred = resized
     # Skip blurring for now, as it may not be necessary
     # blurred = resized
     
@@ -121,12 +129,12 @@ def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False, blur_kernel: i
         )
     else:
         # Use fixed thresholding
-        binary = cv2.threshold(
+        _, binary = cv2.threshold(
             blurred, 
             150,
             255, 
             cv2.THRESH_BINARY_INV 
-        )[1]
+        )
     # Pad the image with a border to avoid issues with Tesseract
     binary = cv2.copyMakeBorder(
         binary, 10, 10, 10, 10, 
@@ -139,10 +147,12 @@ def preprocess_for_ocr(image: np.ndarray, use_otsu: bool = False, blur_kernel: i
     # )
 
     # Apply morphological operations to clean up
-    kernel = np.ones((3, 3), np.uint8)
-    # cleaned = cv2.dilate(binary, kernel, iterations=1)
-    cleaned = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
-    # cleaned = resized
+    if morph_kernel > 1:
+        kernel = np.ones((morph_kernel, morph_kernel), np.uint8)
+        # cleaned = cv2.dilate(binary, kernel, iterations=1)
+        cleaned = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+    else:
+        cleaned = binary
     
     return cleaned
 
@@ -159,7 +169,12 @@ def remove_large_contours(gray: np.ndarray, min_area: int = 500, max_area: int =
     Returns:
         Image with large contours removed
     """
-    negative_gray = cv2.bitwise_not(gray)
+    if len(gray.shape) == 3:
+        res = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+    else:
+        res = gray.copy()
+
+    negative_gray = cv2.bitwise_not(res)
 
     contours, _ = cv2.findContours(negative_gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -167,6 +182,6 @@ def remove_large_contours(gray: np.ndarray, min_area: int = 500, max_area: int =
         area = cv2.contourArea(contour)
         aspect_ratio = cv2.boundingRect(contour)[2] / cv2.boundingRect(contour)[3]
         if area < min_area or area > max_area or aspect_ratio < min_aspect_ratio or aspect_ratio > 1 / min_aspect_ratio:
-            cv2.drawContours(gray, [contour], -1, (255,), thickness=cv2.FILLED)
+            cv2.drawContours(res, [contour], -1, (255,), thickness=cv2.FILLED)
     
-    return gray
+    return res

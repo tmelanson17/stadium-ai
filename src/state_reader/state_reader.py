@@ -11,7 +11,7 @@ from src.state.pokestate_defs import PlayerID, MessageType, ImageUpdate
 from src.state_reader.condition_reader import read_text_from_roi
 from src.state_reader.phrases import parse_update_message, Messages
 from src.state_reader.state_updater import enact_changes
-from src.state_reader.hp_reader import get_hp
+from src.state_reader.hp_reader import get_hp, get_pokemon_name
 from src.utils.shared_image_list import SharedImageList
 from src.utils.serialization import deserialize_image_update
 from src.utils.battle_state_serialization import BattleStateSerializer
@@ -111,15 +111,19 @@ class PlayerHPReader:
             print("Invalid player ID, skipping HP update.")
             return None
         print(f"Updating HP for {update.player_id.value}...")
-        hp = get_hp(update.image, update.roi.to_coord())
-        print(f"Read HP: {hp} for player {update.player_id.value}")
-        if hp < 0:
-            print("Invalid HP read, skipping update.")
-            return
-        # TODO: Have some filtering on the read HP
         state = battle_state.get_state()
         opponent = update.player_id != PlayerID.P1
-        enact_changes(state, ("actor","hp",hp), opponent)
+        # TODO: Have some filtering on the read HP
+        hp = get_hp(update.image, update.roi.to_coord())
+        print(f"Read HP: {hp} for player {update.player_id.value}")
+        if hp >= 0:
+            enact_changes(state, ("actor","hp",hp), opponent)
+
+        # Update the Pokemon's name if valid.
+        name = get_pokemon_name(update.image, update.roi.to_coord(), state, opponent=opponent)
+        if name:
+            enact_changes(state, ("actor","switch",name), opponent)
+
         self.updated = True
 
     

@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import os
 
-from src.state_reader.hp_reader import get_pokemon_name
+from src.state_reader.hp_reader import get_pokemon_name, get_hp
 from src.state.pokestate import BattleState
 from src.state.pokestate_defs import Rectangle
 from test.state_reader.test_utils import create_example_battle_state
@@ -122,6 +122,42 @@ class TestHPReader(unittest.TestCase):
                         f"Expected non-empty string for {image_path}")
                 
                 print(f"P2 Pokemon name from {os.path.basename(image_path)}: {result}")
+
+    def test_pokemon_hp_reading(self):
+        """Test that HP is read from the image correctly"""
+        images, image_paths = self.load_test_images()
+        
+        if not images:
+            return
+            
+        # Test with the first available image
+        test_image = images[0]
+        test_path = image_paths[0]
+        
+        # Test P1
+        p1_bbox = self.convert_rectangle_to_bbox(self.P1_HP)
+        p1_hp = get_hp(
+            image=test_image,
+            roi=p1_bbox,
+        )
+        
+        # Test P2 
+        p2_bbox = self.convert_rectangle_to_bbox(self.P2_HP)
+        p2_hp = get_hp(
+            image=test_image,
+            roi=p2_bbox,
+        )
+        
+        print(f"Results from {os.path.basename(test_path)}:")
+        print(f"  P1: {p1_hp}")
+        print(f"  P2: {p2_hp}")
+        
+        # At minimum, the function should not crash and should return expected types
+        self.assertIsNotNone(p1_hp)
+        self.assertIsNotNone(p2_hp)
+        self.assertGreater(p1_hp, 0, "P1 HP should be greater than 0")
+        self.assertGreater(p2_hp, 0, "P2 HP should be greater than 0")
+
 
     def test_get_pokemon_name_with_known_pokemon(self):
         """Test that get_pokemon_name returns reasonable results when Pokemon are in battle state"""
