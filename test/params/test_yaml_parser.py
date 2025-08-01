@@ -144,13 +144,5 @@ if __name__ == "__main__":
         print(f"Active player Pokemon: {battle_state.player_team.pk_list[0].species}")
         print(f"Active opponent Pokemon: {battle_state.opponent_team.pk_list[0].species}")
         
-        # Test numpy conversion
-        numpy_array = battle_state.to_numpy()
-        print(f"BattleState numpy array shape: {numpy_array.shape}")
-        
-        # Test conversion back from numpy
-        reconstructed_state = BattleState.from_numpy(numpy_array)
-        print(f"Successfully reconstructed BattleState from numpy array")
-        
     except Exception as e:
         print(f"Error: {e}")

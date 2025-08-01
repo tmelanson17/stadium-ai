@@ -41,6 +41,7 @@ class PokemonState:
     volatile: VolatileStatus  = VolatileStatus.OK
     substitute: bool = False
     invulnerable: bool = False
+    twoturn: bool = False
     recharge: bool = False
     boosts: dict[Stat, int] = {stat: 0 for stat in Stat}
 
