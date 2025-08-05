@@ -101,7 +101,7 @@ def get_hp(image: np.ndarray, roi: BBox) -> int:
     return int(hp_string)
 
 name_i = 0
-def get_pokemon_name(image: np.ndarray, roi: BBox, battle_state: BattleState, opponent: bool = False) -> Optional[str]:
+def get_pokemon_name(image: np.ndarray, roi: BBox, battle_state: BattleState, opponent: bool = False) -> Tuple[Optional[str], int]:
     """
     Extract the Pokemon name from the specified region of interest (ROI).
 
@@ -127,8 +127,8 @@ def get_pokemon_name(image: np.ndarray, roi: BBox, battle_state: BattleState, op
     )
     names = [name.strip() for name in names if name is not None and len(name.strip()) > 0]
     if not names:
-        return None
+        return None, -1
 
     # Get the closest matching Pokemon name from the messages
     closest_name = get_closest_pokemon_name(names, battle_state, opponent)
-    return closest_name
+    return closest_name, names.index(closest_name) if closest_name in names else -1

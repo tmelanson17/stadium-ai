@@ -32,7 +32,8 @@ class PokemonState:
     type1: Optional[str] = None # Species type 1,2
     type2: Optional[str] = None
     # TODO: Convert to % when encoding for AI
-    hp: float = 0.0 # Current HP of the Pokemon 
+    hp: int = 0 # Current HP of the Pokemon 
+    hp_max: int = 0 # Max HP of the Pokemon
     status: Status = Status.NONE # Status condition of the Pokemon
     trapped: bool = False # Volatile conditions (listed one at a time)
     two_turn_move: bool = False # Whether the Pokemon is currently using a two-turn move

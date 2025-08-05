@@ -120,9 +120,9 @@ class PlayerHPReader:
             enact_changes(state, ("actor","hp",hp), opponent)
 
         # Update the Pokemon's name if valid.
-        name = get_pokemon_name(update.image, update.roi.to_coord(), state, opponent=opponent)
+        name, idx = get_pokemon_name(update.image, update.roi.to_coord(), state, opponent=opponent)
         if name:
-            enact_changes(state, ("actor","switch",name), opponent)
+            enact_changes(state, ("actor","switch",idx), opponent)
 
         self.updated = True
 

@@ -172,7 +172,7 @@ class TestHPReader(unittest.TestCase):
         
         # Test P1
         p1_bbox = self.convert_rectangle_to_bbox(self.P1_HP)
-        p1_result = get_pokemon_name(
+        p1_result, _ = get_pokemon_name(
             image=test_image,
             roi=p1_bbox,
             battle_state=self.battle_state,
@@ -181,7 +181,7 @@ class TestHPReader(unittest.TestCase):
         
         # Test P2 
         p2_bbox = self.convert_rectangle_to_bbox(self.P2_HP)
-        p2_result = get_pokemon_name(
+        p2_result, _ = get_pokemon_name(
             image=test_image,
             roi=p2_bbox,
             battle_state=self.battle_state,
@@ -201,8 +201,8 @@ class TestHPReader(unittest.TestCase):
         # Test with a small empty image
         empty_image = np.zeros((100, 100, 3), dtype=np.uint8)
         p1_bbox = self.convert_rectangle_to_bbox(self.P1_HP)
-        
-        result = get_pokemon_name(
+
+        result, _ = get_pokemon_name(
             image=empty_image,
             roi=p1_bbox,
             battle_state=self.battle_state,
